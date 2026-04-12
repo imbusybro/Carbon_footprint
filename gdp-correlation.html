@@ -257,27 +257,25 @@
   }
 
   async function init() {
-    try {
-      const [countries, contMap, gdp] = await Promise.all([
-        api('/countries'),
-        api('/countries-with-continent'),
-        api('/gdp-co2')
-      ]);
-      allCountries = countries.sort();
-      contMap.forEach(r => { countryContinent[r.country_name.toLowerCase()] = r.continent_name; });
-      allGdpData = gdp;
-
-      renderEntityTags();
-      populateDropdown();
-      await renderAll();
-    } catch(e) {
-      console.error('Init error', e);
-      // Fallback: use hardcoded list if API fails
-      allCountries = ['china','india','united states','france','germany','brazil','japan'];
-      renderEntityTags();
-      populateDropdown();
-    }
+  try {
+    const [countries, contMap, gdp] = await Promise.all([
+      api('/countries'),
+      api('/countries-with-continent'),
+      api('/gdp-co2')
+    ]);
+    allCountries = countries.sort();
+    contMap.forEach(r => { countryContinent[r.country_name.toLowerCase()] = r.continent_name; });
+    allGdpData = gdp;
+  } catch(e) {
+    console.warn('API error, using fallback country list', e);
+    // Fallback list of major countries
+    allCountries = ['china','india','united states','indonesia','pakistan','brazil','nigeria','bangladesh','russia','mexico','japan','ethiopia','philippines','egypt','vietnam','germany','iran','turkey','thailand','france','united kingdom','italy','south africa','south korea','spain','canada','saudi arabia','australia'];
+  } finally {
+    renderEntityTags();
+    populateDropdown();
+    await renderAll();
   }
+}
 
   function getCurrentEntityList() {
     return entityMode === 'country' ? allCountries : CONTINENTS;

@@ -711,13 +711,15 @@
         type:'line', data:{ labels: filtered.map(d=>d.year), datasets:[{ label:'CO₂ (Mt)', data: filtered.map(d=>d.total_emissions), borderColor:'#1e7a4a', borderWidth:3, tension:0.2 }] },
         options:{ responsive:true, maintainAspectRatio:false }
       });
-      const latest = filtered[filtered.length-1], first = filtered[0];
-      $('kpiEmissions').innerText = formatNum(latest.total_emissions) + ' Mt';
-      $('kpiEmissionsTrend').innerHTML = `${((latest.total_emissions-first.total_emissions)/first.total_emissions*100).toFixed(1)}% vs ${first.year}`;
-    } catch(e) {
-      destroy(emissionsChart);
-      $('kpiEmissions').innerText = '—';
-      $('kpiEmissionsTrend').innerHTML = 'No data';
+      const latest = filtered[filtered.length-1];
+const first = filtered[0];
+$('kpiEmissions').innerText = formatNum(latest.total_emissions) + ' Mt';
+if (first.total_emissions === 0) {
+  $('kpiEmissionsTrend').innerHTML = `+∞% vs ${first.year}`;
+} else {
+  const pct = ((latest.total_emissions - first.total_emissions)/first.total_emissions*100).toFixed(1);
+  $('kpiEmissionsTrend').innerHTML = `${pct}% vs ${first.year}`;
+}
       const container = $('emissionsContainer');
       container.querySelector('.error-message')?.remove();
       container.insertAdjacentHTML('beforeend', '<div class="error-message">No emissions data</div>');
@@ -842,10 +844,33 @@
     } finally { hideLoader('continentLoading'); }
   }
 
+  async function updateCountryIntensityKPI() {
+  try {
+    const year = currentDecade === 'all' ? 2020 : Math.min(parseInt(currentDecade) + 9, 2022);
+    const [emData, gdpData] = await Promise.all([
+      api(`/compare?countries=${encodeURIComponent(selectedCountry)}`),
+      api('/gdp-co2')
+    ]);
+    const emFiltered = filterByDecade(emData, 'year');
+    const gdpFiltered = filterByDecade(gdpData, 'year').filter(d => d.country_name?.toLowerCase() === selectedCountry.toLowerCase());
+    const latestEm = emFiltered.find(d => d.year === year)?.total_emissions;
+    const latestGdp = gdpFiltered.find(d => d.year === year)?.gdp;
+    if (latestEm && latestGdp && latestGdp > 0) {
+      const intensity = (latestEm * 1e12) / latestGdp;
+      $('kpiIntensity').innerText = intensity.toFixed(2);
+    } else {
+      $('kpiIntensity').innerText = '—';
+    }
+  } catch (e) {
+    $('kpiIntensity').innerText = '—';
+  }
+}  
+
   async function refreshAll() {
     await loadMeta();
     updateCountryInsights(selectedCountry);
     await Promise.allSettled([ drawEmissions(), drawPerCapita(), drawEnergyMix(), drawGdpScatter(), drawContinentComparison() ]);
+    updateCountryIntensityKPI()
   }
 
   // ----- Init -----

@@ -1031,22 +1031,28 @@
 
   // ── 7. KPI: Emission Intensity (from gdp-co2) ─────────────────
   async function updateIntensityKPI() {
-    try {
-      const raw      = await api('/gdp-co2');
-      const filtered = filterByDecade(raw, 'year');
-      if (!filtered.length) return;
-      const latestYear = Math.max(...filtered.map(d=>d.year));
-      const recent = filtered.filter(d=>d.year===latestYear);
-      const totalEm  = recent.reduce((s,d)=>s+(d.total_emissions||0),0);
-      const totalGdp = recent.reduce((s,d)=>s+(d.gdp||0),0);
-      const intensity = totalGdp>0 ? (totalEm*1e12)/totalGdp : null;
-      if (intensity!=null) {
-        $('kpiIntensity').textContent = intensity.toFixed(2);
-        $('kpiIntensity').classList.remove('kpi-loading');
-      }
-    } catch(e) { console.error('Intensity KPI',e); }
+  try {
+    let year;
+    if (currentDecade === 'all') {
+      year = 2020;
+    } else {
+      year = Math.min(parseInt(currentDecade) + 9, 2022);
+    }
+    const response = await fetch(`${API}/emission-intensity/${year}`);
+    if (!response.ok) throw new Error('Failed to fetch intensity');
+    const data = await response.json();
+    const intensity = data.intensity;
+    if (intensity !== null && !isNaN(intensity) && intensity > 0) {
+      $('kpiIntensity').textContent = intensity.toFixed(2);
+    } else {
+      $('kpiIntensity').textContent = '—';
+    }
+    $('kpiIntensity').classList.remove('kpi-loading');
+  } catch (e) {
+    console.warn('Intensity KPI error', e);
+    $('kpiIntensity').textContent = '—';
   }
-
+}
   // ── 8. KPI: Renewable Share (from global-renewable-share) ─────
   async function updateRenewableKPI() {
     try {

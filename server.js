@@ -72,7 +72,7 @@ app.get('/api/gdp-co2', async (req, res) => {
         SELECT 
           c.country_name, 
           y.year, 
-          g.gdp AS gdp, 
+          MAX(g.gdp) AS gdp, 
           SUM(e.emission_amount) AS total_emissions
         FROM emissions e
         JOIN country c ON e.country_id = c.country_id
@@ -86,7 +86,6 @@ app.get('/api/gdp-co2', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
-
   // ── 4. Energy mix for a country ──────────────────────────────────────
 app.get('/api/energy-mix/:country', (req, res) => runQuery(res, async () => {
     const country = req.params.country.toLowerCase();
@@ -205,11 +204,11 @@ app.get('/api/top-renewable/:year', (req, res) => runQuery(res, async () => {
 
 // ── 11. All countries (dropdown) ─────────────────────────────────────
 app.get('/api/countries', (req, res) => runQuery(res, async () => {
-  const [rows] = await pool.query(
-    'SELECT country_name FROM country ORDER BY country_name'
-  );
-  return rows.map(r => r.country_name);
-}));
+    const [rows] = await pool.query(
+      'SELECT country_name FROM country ORDER BY country_name'
+    );
+    return rows.map(r => r.country_name);
+  }));
 
 // ── 12. Countries with their continent ───────────────────────────────
 app.get('/api/countries-with-continent', (req, res) => runQuery(res, async () => {
@@ -263,7 +262,6 @@ app.get('/api/emission-intensity/:year', async (req, res) => {
       const intensity = rows[0]?.global_intensity || 0;
       res.json({ intensity });
     } catch (err) {
-      console.error('Intensity endpoint error:', err);
       res.status(500).json({ error: err.message });
     }
   });
