@@ -1,0 +1,315 @@
+country,continent,region
+ASEAN (Ember),asia,Asia
+Afghanistan,asia,Asia
+Africa,africa,Africa
+Africa (EI),africa,Africa
+Africa (EIA),africa,Africa
+Africa (Ember),africa,Africa
+Africa (Shift),africa,Africa
+Albania,europe,Europe
+Algeria,africa,Africa
+American Samoa,oceania,Oceania
+Angola,africa,Africa
+Antarctica,oceania,Oceania
+Antigua and Barbuda,north america,North America
+Argentina,south america,South America
+Armenia,asia,Asia
+Aruba,north america,North America
+Asia,asia,Asia
+Asia (Ember),asia,Asia
+Asia Pacific (EI),asia,Asia-Pacific
+Asia and Oceania (EIA),asia,Asia-Pacific
+Asia and Oceania (Shift),asia,Asia-Pacific
+Australia,oceania,Oceania
+Australia and New Zealand (EIA),oceania,Australia & New Zealand
+Austria,europe,Europe
+Azerbaijan,asia,Asia
+Bahamas,north america,North America
+Bahrain,asia,Asia
+Bangladesh,asia,Asia
+Barbados,north america,North America
+Belarus,europe,Europe
+Belgium,europe,Europe
+Belize,north america,North America
+Benin,africa,Africa
+Bermuda,north america,North America
+Bhutan,asia,Asia
+Bolivia,south america,South America
+Bosnia and Herzegovina,europe,Europe
+Botswana,africa,Africa
+Brazil,south america,South America
+British Virgin Islands,north america,North America
+Brunei,asia,Asia
+Bulgaria,europe,Europe
+Burkina Faso,africa,Africa
+Burundi,africa,Africa
+CIS (EI),europe,CIS
+Cambodia,asia,Asia
+Cameroon,africa,Africa
+Canada,north america,North America
+Cape Verde,africa,Africa
+Cayman Islands,north america,North America
+Central African Republic,africa,Africa
+Central America (EI),north america,Central America
+Central and South America (EIA),south america,South America
+Central and South America (Shift),south america,South America
+Chad,africa,Africa
+Chile,south america,South America
+China,asia,Asia
+Colombia,south america,South America
+Comoros,africa,Africa
+Congo,africa,Africa
+Cook Islands,oceania,Oceania
+Costa Rica,north america,North America
+Cote d'Ivoire,africa,Africa
+Croatia,europe,Europe
+Cuba,north america,North America
+Curacao,north america,North America
+Cyprus,asia,Asia
+Czech Republic,europe,Europe
+Czechoslovakia,europe,Europe
+Democratic Republic of Congo,africa,Africa
+Denmark,europe,Europe
+Djibouti,africa,Africa
+Dominica,north america,North America
+Dominican Republic,north america,North America
+EU (Ember),europe,Europe
+EU28 (Shift),europe,European Union
+East Germany,europe,Europe
+East Timor,asia,Asia
+Eastern Africa (EI),africa,Eastern Africa
+Eastern Europe and Eurasia (EIA),europe,Eastern Europe & Eurasia
+Ecuador,south america,South America
+Egypt,africa,Africa
+El Salvador,north america,North America
+Equatorial Guinea,africa,Africa
+Eritrea,africa,Africa
+Estonia,europe,Europe
+Eswatini,africa,Africa
+Ethiopia,africa,Africa
+Eurasia (EIA),europe,Eurasia
+Eurasia (Shift),europe,Eurasia
+Europe,europe,Europe
+Europe (EI),europe,Europe
+Europe (EIA),europe,Europe
+Europe (Ember),europe,Europe
+Europe (Shift),europe,Europe
+European Union (27),europe,European Union
+Falkland Islands,south america,South America
+Faroe Islands,europe,Europe
+Fiji,oceania,Oceania
+Finland,europe,Europe
+France,europe,Europe
+French Guiana,south america,South America
+French Polynesia,oceania,Oceania
+G20 (Ember),asia,Asia
+G7 (Ember),north america,North America
+Gabon,africa,Africa
+Gambia,africa,Africa
+Georgia,asia,Asia
+Germany,europe,Europe
+Ghana,africa,Africa
+Gibraltar,europe,Europe
+Greece,europe,Europe
+Greenland,north america,North America
+Grenada,north america,North America
+Guadeloupe,north america,North America
+Guam,oceania,Oceania
+Guatemala,north america,North America
+Guinea,africa,Africa
+Guinea-Bissau,africa,Africa
+Guyana,south america,South America
+Haiti,north america,North America
+High-income countries,asia,Asia
+Honduras,north america,North America
+Hong Kong,asia,Asia
+Hungary,europe,Europe
+Iceland,europe,Europe
+India,asia,Asia
+Indonesia,asia,Asia
+Iran,asia,Asia
+Iraq,asia,Asia
+Ireland,europe,Europe
+Israel,asia,Asia
+Italy,europe,Europe
+Jamaica,north america,North America
+Japan,asia,Asia
+Jordan,asia,Asia
+Kazakhstan,asia,Asia
+Kenya,africa,Africa
+Kiribati,oceania,Oceania
+Kosovo,europe,Europe
+Kuwait,asia,Asia
+Kyrgyzstan,asia,Asia
+Laos,asia,Asia
+Latin America and Caribbean (Ember),north america,Latin America & Caribbean
+Latvia,europe,Europe
+Lebanon,asia,Asia
+Lesotho,africa,Africa
+Liberia,africa,Africa
+Libya,africa,Africa
+Lithuania,europe,Europe
+Low-income countries,africa,Africa
+Lower-middle-income countries,asia,Asia
+Luxembourg,europe,Europe
+Macao,asia,Asia
+Madagascar,africa,Africa
+Malawi,africa,Africa
+Malaysia,asia,Asia
+Maldives,asia,Asia
+Mali,africa,Africa
+Malta,europe,Europe
+Martinique,north america,North America
+Mauritania,africa,Africa
+Mauritius,africa,Africa
+Mexico,north america,North America
+Micronesia (country),oceania,Oceania
+Middle Africa (EI),africa,Middle Africa
+Middle East (EI),asia,Middle East
+Middle East (EIA),asia,Middle East
+Middle East (Ember),asia,Middle East
+Middle East (Shift),asia,Middle East
+Moldova,europe,Europe
+Mongolia,asia,Asia
+Montenegro,europe,Europe
+Montserrat,north america,North America
+Morocco,africa,Africa
+Mozambique,africa,Africa
+Myanmar,asia,Asia
+Namibia,africa,Africa
+Nauru,oceania,Oceania
+Nepal,asia,Asia
+Netherlands,europe,Europe
+Netherlands Antilles,north america,North America
+New Caledonia,oceania,Oceania
+New Zealand,oceania,Oceania
+Nicaragua,north america,North America
+Niger,africa,Africa
+Nigeria,africa,Africa
+Niue,oceania,Oceania
+Non-OECD (EI),asia,Asia
+Non-OECD (EIA),asia,Asia
+Non-OPEC (EI),asia,Non-OPEC
+Non-OPEC (EIA),asia,Non-OPEC
+North America,north america,North America
+North America (EI),north america,North America
+North America (Ember),north america,North America
+North America (Shift),north america,North America
+North Korea,asia,Asia
+North Macedonia,europe,Europe
+Northern Mariana Islands,oceania,Oceania
+Norway,europe,Europe
+OECD (EI),europe,OECD
+OECD (EIA),europe,OECD
+OECD (Ember),europe,OECD
+OECD (Shift),europe,OECD
+OPEC (EI),asia,OPEC
+OPEC (EIA),asia,OPEC
+OPEC (Shift),asia,OPEC
+Oceania,oceania,Oceania
+Oceania (Ember),oceania,Oceania
+Oman,asia,Asia
+Other Africa (EI),africa,Africa
+Other Americas (EIA),north america,North America
+Other Asia Pacific (EI),asia,Asia-Pacific
+Other Asia-Pacific (EIA),asia,Asia-Pacific
+Other CIS (EI),europe,Europe
+Other Caribbean (EI),north america,North America
+Other Eastern Africa (EI),africa,Africa
+Other Europe (EI),europe,Europe
+Other Middle Africa (EI),africa,Africa
+Other Middle East (EI),asia,Asia
+Other North America (EI),north america,North America
+Other Northern Africa (EI),africa,Africa
+Other South America (EI),south america,South America
+Other South and Central America (EI),south america,South America
+Other Southern Africa (EI),africa,Africa
+Other Western Africa (EI),africa,Africa
+Pakistan,asia,Asia
+Palestine,asia,Asia
+Panama,north america,North America
+Papua New Guinea,oceania,Oceania
+Paraguay,south america,South America
+Persian Gulf (EIA),asia,Asia
+Persian Gulf (Shift),asia,Asia
+Peru,south america,South America
+Philippines,asia,Asia
+Poland,europe,Europe
+Portugal,europe,Europe
+Puerto Rico,north america,North America
+Qatar,asia,Asia
+Rest of World (EI),asia,Asia
+Reunion,africa,Africa
+Romania,europe,Europe
+Russia,europe,Europe
+Rwanda,africa,Africa
+Saint Helena,africa,Africa
+Saint Kitts and Nevis,north america,North America
+Saint Lucia,north america,North America
+Saint Pierre and Miquelon,north america,North America
+Saint Vincent and the Grenadines,north america,North America
+Samoa,oceania,Oceania
+Sao Tome and Principe,africa,Africa
+Saudi Arabia,asia,Asia
+Senegal,africa,Africa
+Serbia,europe,Europe
+Serbia and Montenegro,europe,Europe
+Seychelles,africa,Africa
+Sierra Leone,africa,Africa
+Singapore,asia,Asia
+Slovakia,europe,Europe
+Slovenia,europe,Europe
+Solomon Islands,oceania,Oceania
+Somalia,africa,Africa
+South Africa,africa,Africa
+South America,south america,South America
+South Korea,asia,Asia
+South Sudan,africa,Africa
+South and Central America (EI),south america,South America
+Spain,europe,Europe
+Sri Lanka,asia,Asia
+Sudan,africa,Africa
+Suriname,south america,South America
+Sweden,europe,Europe
+Switzerland,europe,Europe
+Syria,asia,Asia
+Taiwan,asia,Asia
+Tajikistan,asia,Asia
+Tanzania,africa,Africa
+Thailand,asia,Asia
+Togo,africa,Africa
+Tonga,oceania,Oceania
+Trinidad and Tobago,north america,North America
+Tunisia,africa,Africa
+Turkey,asia,Asia
+Turkmenistan,asia,Asia
+Turks and Caicos Islands,north america,North America
+Tuvalu,oceania,Oceania
+U.S. Pacific Islands (EIA),oceania,Oceania
+U.S. Territories (EIA),north america,North America
+USSR,europe,Europe
+Uganda,africa,Africa
+Ukraine,europe,Europe
+United Arab Emirates,asia,Asia
+United Kingdom,europe,Europe
+United States,north america,North America
+United States Pacific Islands (Shift),,
+United States Territories (Shift),,
+United States Virgin Islands,north america,North America
+Upper-middle-income countries,asia,Asia
+Uruguay,south america,South America
+Uzbekistan,asia,Asia
+Vanuatu,oceania,Oceania
+Venezuela,south america,South America
+Vietnam,asia,Asia
+Wake Island (EIA),,
+Wake Island (Shift),,
+West Germany,,
+Western Africa (EI),africa,Western Africa
+Western Europe (EIA),,
+Western Sahara,africa,Africa
+World,asia,Asia
+Yemen,asia,Asia
+Yugoslavia,,
+Zambia,africa,Africa
+Zimbabwe,africa,Africa

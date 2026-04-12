@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDP Correlation | Carbon Intelligence</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg:            #f2f5f0;
+      --surface:       #ffffff;
+      --surface-2:     #eef1ec;
+      --border:        #d4dbd0;
+      --text-primary:  #1a2318;
+      --text-secondary:#4a5e47;
+      --text-muted:    #7a927a;
+      --accent:        #1e7a4a;
+      --accent-light:  #d0ead8;
+      --amber:         #c97c12;
+      --red:           #c94040;
+      --blue:          #2058a8;
+      --shadow-sm:  0 1px 3px rgba(20,40,20,0.08);
+      --shadow-md:  0 4px 12px rgba(20,40,20,0.10);
+      --radius:     16px;
+      --radius-sm:  8px;
+      --radius-lg:  24px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); line-height:1.6; }
+    .navbar {
+      background: var(--surface); border-bottom:1px solid var(--border); padding:0 28px;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm);
+    }
+    .nav-brand { font-size:1.15rem; font-weight:700; color:var(--accent); padding:14px 0; display:flex; align-items:center; gap:8px; }
+    .nav-brand .leaf-icon { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; }
+    .nav-links { display:flex; gap:4px; }
+    .nav-links a { padding:7px 14px; border-radius:30px; text-decoration:none; color:var(--text-secondary); font-weight:500; font-size:0.88rem; display:flex; align-items:center; gap:6px; }
+    .nav-links a:hover { background:var(--surface-2); }
+    .nav-links a.active { background:var(--accent); color:#fff; }
+    .dashboard { max-width:1600px; margin:0 auto; padding:28px 24px; }
+    .page-header h1 { font-size:2rem; font-weight:700; }
+    .page-header h1 span { color:var(--accent); }
+    .subtitle { color:var(--text-muted); margin-bottom:24px; }
+    .filter-panel {
+      background:var(--surface); border-radius:var(--radius-lg); padding:20px 24px; margin-bottom:24px;
+      box-shadow:var(--shadow-sm); display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;
+    }
+    .filter-group { display:flex; flex-direction:column; gap:8px; }
+    .filter-label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); }
+    .filter-select {
+      padding:8px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      background:white; font-size:0.875rem; cursor:pointer;
+    }
+    .mode-toggle { display:flex; border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+    .mode-toggle label { padding:8px 16px; cursor:pointer; font-size:0.875rem; font-weight:500; color:var(--text-muted); }
+    .mode-toggle input[type=radio] { display:none; }
+    .mode-toggle input:checked + label { background:var(--accent); color:white; }
+    .entity-picker { position:relative; min-width:280px; }
+    .entity-search-input {
+      width:100%; padding:8px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-size:0.875rem; outline:none;
+    }
+    .entity-dropdown {
+      position:absolute; top:calc(100% + 4px); left:0; right:0; background:white;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm); max-height:220px; overflow-y:auto;
+      z-index:200; box-shadow:var(--shadow-md); display:none;
+    }
+    .entity-dropdown.open { display:block; }
+    .entity-option {
+      padding:9px 14px; display:flex; align-items:center; gap:10px; cursor:pointer;
+      font-size:0.875rem; border-bottom:1px solid var(--surface-2);
+    }
+    .entity-option:hover { background:var(--surface-2); }
+    .entity-option.disabled { opacity:0.4; cursor:not-allowed; }
+    .entity-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .entity-tag {
+      background:var(--accent); color:white; padding:4px 10px; border-radius:30px;
+      font-size:0.78rem; font-weight:600; display:flex; align-items:center; gap:6px;
+    }
+    .entity-tag .remove-tag { cursor:pointer; opacity:0.75; }
+    .chart-card {
+      background:var(--surface); border-radius:var(--radius-lg); padding:24px; margin-bottom:24px;
+      box-shadow:var(--shadow-sm);
+    }
+    .card-header { display:flex; justify-content:space-between; margin-bottom:20px; }
+    .card-title { font-size:1.1rem; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .chart-container { position:relative; height:360px; }
+    canvas { max-height:360px; width:100% !important; }
+    .loading-overlay {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,0.7); z-index:10; opacity:0; pointer-events:none;
+    }
+    .loading-overlay.visible { opacity:1; }
+    .spinner {
+      width:24px; height:24px; border:2px solid var(--border); border-top-color:var(--accent);
+      border-radius:50%; animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .error-message { color:var(--red); padding:20px; text-align:center; }
+    .back-link { display:inline-flex; align-items:center; gap:8px; margin-top:20px; color:var(--accent); text-decoration:none; }
+    .insight-panel {
+      background: var(--surface); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px;
+      border-left: 4px solid var(--accent); box-shadow: var(--shadow-sm);
+    }
+    .insight-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .insight-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .insight-item { display: flex; gap: 12px; }
+    .insight-icon { width: 32px; height: 32px; background: var(--accent-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.9rem; flex-shrink: 0; }
+    .insight-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+    .insight-text strong { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand"><div class="leaf-icon"><i class="fas fa-leaf"></i></div> Carbon Intelligence</div>
+  <div class="nav-links">
+    <a href="index.html"><i class="fas fa-chart-pie"></i> Overview</a>
+    <a href="country.html"><i class="fas fa-flag"></i> Country Analysis</a>
+    <a href="energy-transition.html"><i class="fas fa-solar-panel"></i> Energy Transition</a>
+    <a href="gdp-correlation.html" class="active"><i class="fas fa-chart-line"></i> GDP Correlation</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <div class="page-header">
+    <h1>GDP vs CO₂ <span>Emissions Analysis</span></h1>
+    <div class="subtitle">Explore the relationship between economic output and carbon footprint</div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-panel">
+    <div class="filter-group">
+      <span class="filter-label"><i class="fas fa-calendar"></i> Decade</span>
+      <select class="filter-select" id="decadeFilter">
+        <option value="all">All Years</option>
+        <option value="1960">1960s</option>
+        <option value="1970">1970s</option>
+        <option value="1980">1980s</option>
+        <option value="1990">1990s</option>
+        <option value="2000">2000s</option>
+        <option value="2010">2010s</option>
+        <option value="2020">2020s</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label"><i class="fas fa-layer-group"></i> Entity Mode</span>
+      <div class="mode-toggle">
+        <input type="radio" name="entityMode" id="modeCountry" value="country" checked>
+        <label for="modeCountry"><i class="fas fa-flag"></i> Countries</label>
+        <input type="radio" name="entityMode" id="modeContinent" value="continent">
+        <label for="modeContinent"><i class="fas fa-globe"></i> Continents</label>
+      </div>
+    </div>
+    <div class="filter-group" style="flex:1;">
+      <span class="filter-label"><i class="fas fa-search"></i> Select Entities <span id="selCount"></span></span>
+      <div class="entity-picker" id="entityPicker">
+        <input type="text" class="entity-search-input" id="entitySearch" placeholder="Search and select (up to 5)…" autocomplete="off">
+        <div class="entity-dropdown" id="entityDropdown"></div>
+      </div>
+      <div class="entity-tags" id="entityTags"></div>
+    </div>
+  </div>
+
+  <!-- Insight Panel -->
+  <div class="insight-panel">
+    <div class="insight-title"><i class="fas fa-lightbulb"></i> GDP–CO₂ Correlation Insights</div>
+    <div class="insight-content">
+      <div class="insight-item"><div class="insight-icon"><i class="fas fa-chart-line"></i></div><div class="insight-text"><strong>Strong positive correlation</strong> — Larger economies almost always emit more CO₂, but the slope (intensity) varies dramatically.</div></div>
+      <div class="insight-item"><div class="insight-icon"><i class="fas fa-industry"></i></div><div class="insight-text"><strong>High‑intensity outliers</strong> — Trinidad & Tobago, Turkmenistan, and Venezuela show >15 tonnes per $M GDP due to heavy fossil fuel extraction.</div></div>
+      <div class="insight-item"><div class="insight-icon"><i class="fas fa-leaf"></i></div><div class="insight-text"><strong>Decoupling is visible</strong> — Many European nations (France, Sweden) have reduced emissions while growing GDP, thanks to nuclear and renewables.</div></div>
+      <div class="insight-item"><div class="insight-icon"><i class="fas fa-globe"></i></div><div class="insight-text"><strong>Asia dominates total emissions</strong> — Driven by population and manufacturing, Asia accounts for over 50% of global CO₂.</div></div>
+    </div>
+  </div>
+
+  <!-- Dual-axis Line Chart -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title"><i class="fas fa-chart-line" style="color:var(--accent);"></i> GDP vs CO₂ Emissions Over Time</div>
+      <div><span style="border-bottom:2px solid currentColor;">CO₂ (solid)</span> &nbsp; <span style="border-bottom:2px dashed currentColor;">GDP (dashed)</span></div>
+    </div>
+    <div class="chart-container" id="lineContainer">
+      <canvas id="lineChart"></canvas>
+      <div class="loading-overlay" id="lineLoading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Continent Bar Chart -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title"><i class="fas fa-globe-americas" style="color:var(--blue);"></i> Total Emissions by Continent</div>
+    </div>
+    <div class="chart-container" id="continentContainer">
+      <canvas id="continentChart"></canvas>
+      <div class="loading-overlay" id="continentLoading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Emission Intensity Bar Chart -->
+  <div class="chart-card">
+    <div class="card-header">
+      <div class="card-title"><i class="fas fa-fire-flame-curved" style="color:var(--amber);"></i> Top 15 Countries by Emission Intensity</div>
+    </div>
+    <div class="chart-container" id="intensityContainer">
+      <canvas id="intensityChart"></canvas>
+      <div class="loading-overlay" id="intensityLoading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Overview</a>
+</div>
+
+<script>
+(function(){
+  const API = 'http://localhost:3001/api';
+  const CONTINENTS = ['africa','asia','europe','north america','south america','oceania'];
+  const CONT_COLORS = {
+    'africa':'#f59e0b','asia':'#3b82f6','europe':'#8b5cf6','north america':'#ef4444','south america':'#10b981','oceania':'#f97316'
+  };
+  const LINE_COLORS = ['#1e7a4a','#3b82f6','#f59e0b','#8b5cf6','#ef4444'];
+  const MAX_SEL = 5;
+
+  let allCountries = [], countryContinent = {}, allGdpData = [];
+  let selectedEntities = ['china','france','finland','greece'];
+  let entityMode = 'country';
+  let currentDecade = '2010s';
+
+  let lineChart, continentChart, intensityChart;
+
+  const $ = id => document.getElementById(id);
+  const showLoader = id => $(id)?.classList.add('visible');
+  const hideLoader = id => $(id)?.classList.remove('visible');
+  const destroy = inst => { try { if(inst) inst.destroy(); } catch(_){} };
+
+  function formatNum(n, d=1) {
+    if (n==null || isNaN(n)) return '—';
+    if (n>=1e12) return (n/1e12).toFixed(d)+'T';
+    if (n>=1e9)  return (n/1e9).toFixed(d)+'B';
+    if (n>=1e6)  return (n/1e6).toFixed(d)+'M';
+    if (n>=1e3)  return (n/1e3).toFixed(d)+'K';
+    return n.toFixed(d);
+  }
+
+  async function api(endpoint) {
+    const res = await fetch(API + endpoint);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  function filterByDecade(data, key='year') {
+    if (currentDecade === 'all') return data;
+    const s = parseInt(currentDecade);
+    return data.filter(d => d[key] >= s && d[key] < s+10);
+  }
+
+  async function init() {
+    try {
+      const [countries, contMap, gdp] = await Promise.all([
+        api('/countries'),
+        api('/countries-with-continent'),
+        api('/gdp-co2')
+      ]);
+      allCountries = countries.sort();
+      contMap.forEach(r => { countryContinent[r.country_name.toLowerCase()] = r.continent_name; });
+      allGdpData = gdp;
+
+      renderEntityTags();
+      populateDropdown();
+      await renderAll();
+    } catch(e) { console.error('Init error', e); }
+  }
+
+  function getCurrentEntityList() {
+    return entityMode === 'country' ? allCountries : CONTINENTS;
+  }
+
+  function populateDropdown(filter='') {
+    const dd = $('entityDropdown');
+    const items = getCurrentEntityList();
+    const q = filter.toLowerCase();
+    const shown = filter ? items.filter(i => i.toLowerCase().includes(q)) : items;
+    dd.innerHTML = '';
+    shown.forEach(item => {
+      const key = item.toLowerCase();
+      const sel = selectedEntities.includes(key);
+      const maxed = !sel && selectedEntities.length >= MAX_SEL;
+      const div = document.createElement('div');
+      div.className = 'entity-option' + (maxed ? ' disabled' : '');
+      div.innerHTML = `<input type="checkbox" ${sel?'checked':''} ${maxed?'disabled':''}> ${item}`;
+      if (!maxed) {
+        div.addEventListener('mousedown', e => { e.preventDefault(); toggleEntity(key); });
+      }
+      dd.appendChild(div);
+    });
+  }
+
+  function toggleEntity(key) {
+    const idx = selectedEntities.indexOf(key);
+    if (idx > -1) selectedEntities.splice(idx,1);
+    else if (selectedEntities.length < MAX_SEL) selectedEntities.push(key);
+    renderEntityTags();
+    populateDropdown($('entitySearch').value);
+    renderAll();
+  }
+
+  function renderEntityTags() {
+    const wrap = $('entityTags');
+    wrap.innerHTML = '';
+    selectedEntities.forEach((key, i) => {
+      const tag = document.createElement('span');
+      tag.className = 'entity-tag';
+      tag.style.background = LINE_COLORS[i % LINE_COLORS.length];
+      tag.innerHTML = `${key} <span class="remove-tag" data-key="${key}">✕</span>`;
+      wrap.appendChild(tag);
+    });
+    $('selCount').textContent = `(${selectedEntities.length}/${MAX_SEL})`;
+  }
+
+  $('entitySearch').addEventListener('focus', ()=> $('entityDropdown').classList.add('open'));
+  $('entitySearch').addEventListener('blur', ()=> setTimeout(()=> $('entityDropdown').classList.remove('open'),150));
+  $('entitySearch').addEventListener('input', e=> populateDropdown(e.target.value));
+  $('entityTags').addEventListener('click', e=> { const key = e.target.dataset.key; if (key) toggleEntity(key); });
+  $('decadeFilter').addEventListener('change', e=> { currentDecade = e.target.value; renderAll(); });
+  document.querySelectorAll('input[name="entityMode"]').forEach(r => r.addEventListener('change', e=> {
+    entityMode = e.target.value;
+    selectedEntities = entityMode === 'continent' ? ['asia'] : ['china','france','finland','greece'];
+    renderEntityTags();
+    populateDropdown();
+    renderAll();
+  }));
+
+  async function renderAll() {
+    await Promise.allSettled([ drawLineChart(), drawContinentChart(), drawIntensityChart() ]);
+  }
+
+  async function drawLineChart() {
+    showLoader('lineLoading');
+    try {
+      const emissionsPromises = selectedEntities.map(e => api(`/compare?countries=${encodeURIComponent(e)}`).catch(()=>[]));
+      const emissionsResults = await Promise.all(emissionsPromises);
+      const yearsSet = new Set();
+      const entityData = selectedEntities.map((entity, idx) => {
+        const emData = filterByDecade(emissionsResults[idx] || [], 'year');
+        const gdpData = filterByDecade(allGdpData, 'year').filter(d => 
+          (entityMode === 'country' ? d.country_name?.toLowerCase() === entity : countryContinent[d.country_name?.toLowerCase()] === entity)
+        );
+        const emMap = Object.fromEntries(emData.map(d => [d.year, d.total_emissions]));
+        const gdpMap = {};
+        gdpData.forEach(d => { if (!gdpMap[d.year]) gdpMap[d.year] = 0; gdpMap[d.year] += d.gdp || 0; });
+        const years = [...new Set([...Object.keys(emMap), ...Object.keys(gdpMap)])].map(Number).sort();
+        years.forEach(y => yearsSet.add(y));
+        return { entity, emMap, gdpMap, color: LINE_COLORS[idx % LINE_COLORS.length] };
+      });
+      const years = Array.from(yearsSet).sort((a,b)=>a-b);
+      const datasets = [];
+      entityData.forEach(({entity, emMap, gdpMap, color}) => {
+        datasets.push({ label: entity, data: years.map(y => emMap[y] || null), borderColor: color, borderWidth: 3, yAxisID: 'yLeft', tension: 0.2, spanGaps: true });
+        datasets.push({ label: entity + ' GDP', data: years.map(y => gdpMap[y] || null), borderColor: color, borderDash: [6,4], borderWidth: 2.5, yAxisID: 'yRight', tension: 0.2, spanGaps: true, pointRadius: 0 });
+      });
+      const ctx = $('lineChart').getContext('2d');
+      destroy(lineChart);
+      lineChart = new Chart(ctx, {
+        type: 'line', data: { labels: years, datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { filter: item => !item.text.includes('GDP') } },
+            tooltip: { callbacks: { label: ctx => { const v = ctx.raw; if (v == null) return null; const isGDP = ctx.dataset.yAxisID === 'yRight'; const label = ctx.dataset.label.replace(' GDP',''); return `${label}: ${isGDP ? '$'+formatNum(v) : formatNum(v)+' Mt'}`; } } }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            yLeft: { type: 'linear', position: 'left', title: { display: true, text: 'CO₂ Emissions (Mt)', color: '#1e7a4a' }, ticks: { callback: v => formatNum(v)+' Mt', color: '#1e7a4a' } },
+            yRight: { type: 'linear', position: 'right', title: { display: true, text: 'GDP (USD)', color: '#64748b' }, ticks: { callback: v => '$'+formatNum(v), color: '#64748b' }, grid: { drawOnChartArea: false } }
+          }
+        }
+      });
+    } catch(e) { $('lineContainer').innerHTML = '<div class="error-message">Failed to load chart data</div>'; }
+    finally { hideLoader('lineLoading'); }
+  }
+
+  async function drawContinentChart() {
+    showLoader('continentLoading');
+    try {
+      const data = await api('/continent-emissions');
+      const ctx = $('continentChart').getContext('2d');
+      destroy(continentChart);
+      continentChart = new Chart(ctx, {
+        type: 'bar', data: { labels: data.map(d => d.continent_name), datasets: [{ label: 'Total CO₂ (Mt)', data: data.map(d => d.total_emissions), backgroundColor: data.map(d => CONT_COLORS[d.continent_name.toLowerCase()] || '#94a3b8'), borderRadius: 6 }] },
+        options: { indexAxis: 'y', responsive: true, plugins: { tooltip: { callbacks: { label: c => ` ${formatNum(c.raw)} Mt` } } }, scales: { x: { ticks: { callback: v => formatNum(v) } } } }
+      });
+    } catch(e) { $('continentContainer').innerHTML = '<div class="error-message">Continent data unavailable</div>'; }
+    finally { hideLoader('continentLoading'); }
+  }
+
+  async function drawIntensityChart() {
+    showLoader('intensityLoading');
+    try {
+      const filteredGdp = filterByDecade(allGdpData, 'year');
+      const latestYear = filteredGdp.length ? Math.max(...filteredGdp.map(d=>d.year)) : 2020;
+      const recent = filteredGdp.filter(d => d.year === latestYear);
+      const intensities = [];
+      for (let d of recent) {
+        const country = d.country_name;
+        if (!country) continue;
+        const emData = await api(`/compare?countries=${encodeURIComponent(country)}`).catch(()=>[]);
+        const emFiltered = filterByDecade(emData, 'year');
+        const latestEm = emFiltered.find(e => e.year === latestYear)?.total_emissions;
+        if (latestEm && d.gdp > 0) {
+          const intensity = (latestEm * 1e12) / d.gdp;
+          intensities.push({ country, intensity, continent: countryContinent[country.toLowerCase()] || 'Other' });
+        }
+      }
+      const top15 = intensities.sort((a,b)=> b.intensity - a.intensity).slice(0,15);
+      if (top15.length === 0) throw new Error('No intensity data');
+      const ctx = $('intensityChart').getContext('2d');
+      destroy(intensityChart);
+      intensityChart = new Chart(ctx, {
+        type: 'bar', data: { labels: top15.map(d => d.country), datasets: [{ label: 'Tonnes CO₂ per $M GDP', data: top15.map(d => d.intensity), backgroundColor: top15.map(d => CONT_COLORS[d.continent] || '#94a3b8'), borderRadius: 6 }] },
+        options: { indexAxis: 'y', responsive: true, plugins: { tooltip: { callbacks: { label: c => ` ${c.raw.toFixed(2)} t/$M GDP`, afterLabel: c => `Continent: ${top15[c.dataIndex].continent}` } } } }
+      });
+    } catch(e) { $('intensityContainer').innerHTML = '<div class="error-message">No intensity data available</div>'; }
+    finally { hideLoader('intensityLoading'); }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
