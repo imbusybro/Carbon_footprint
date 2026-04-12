@@ -226,7 +226,7 @@
   let allCountries = [], countryContinent = {}, allGdpData = [];
   let selectedEntities = ['china','france','finland','greece'];
   let entityMode = 'country';
-  let currentDecade = '2010s';
+  let currentDecade = '2000s';
 
   let lineChart, continentChart, intensityChart;
 
@@ -270,7 +270,13 @@
       renderEntityTags();
       populateDropdown();
       await renderAll();
-    } catch(e) { console.error('Init error', e); }
+    } catch(e) {
+      console.error('Init error', e);
+      // Fallback: use hardcoded list if API fails
+      allCountries = ['china','india','united states','france','germany','brazil','japan'];
+      renderEntityTags();
+      populateDropdown();
+    }
   }
 
   function getCurrentEntityList() {
@@ -283,6 +289,10 @@
     const q = filter.toLowerCase();
     const shown = filter ? items.filter(i => i.toLowerCase().includes(q)) : items;
     dd.innerHTML = '';
+    if (shown.length === 0) {
+      dd.innerHTML = '<div class="entity-option" style="color:var(--text-muted);">No results</div>';
+      return;
+    }
     shown.forEach(item => {
       const key = item.toLowerCase();
       const sel = selectedEntities.includes(key);
