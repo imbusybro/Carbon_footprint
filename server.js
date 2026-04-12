@@ -26,14 +26,14 @@ const pool = mysql.createPool({
 // ── Helpers ──────────────────────────────────────────────────────────
 /** Wrap a query so endpoint errors always return valid JSON. */
 async function runQuery(res, queryFn) {
-  try {
-    const result = await queryFn();
-    res.json(result);
-  } catch (err) {
-    console.error('[API error]', err.message);
-    res.status(500).json({ error: err.message });
+    try {
+      const result = await queryFn();
+      res.json(result);
+    } catch (err) {
+      console.error('[API error]', err.message);
+      res.status(500).json({ error: err.message });
+    }
   }
-}
 
 // ── 1. Global emissions trend ────────────────────────────────────────
 app.get('/api/global-trend', (req, res) => runQuery(res, async () => {
