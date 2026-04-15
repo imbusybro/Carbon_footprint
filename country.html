@@ -304,7 +304,7 @@
 
     .insight-item {
       display: flex;
-      gap: 14px;
+      gap: 0;
     }
 
     .insight-icon {
@@ -665,7 +665,7 @@
         ];
         const items = insights[country.toLowerCase()] || generic;
         $('countryInsights').innerHTML = items.map(text => `
-          <div class="insight-item"><div class="insight-icon"></div><div class="insight-text">${text}</div></div>
+          <div class="insight-item"><div class="insight-text">${text}</div></div>
         `).join('');
       }
 
