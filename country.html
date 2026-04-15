@@ -52,7 +52,6 @@
     body {
       font-family: 'Work Sans', sans-serif;
       background-color: var(--bg);
-      /* Layered organic background: radial gradients + subtle noise texture */
       background-image: 
         radial-gradient(circle at 30% 40%, rgba(107, 140, 92, 0.03) 0%, transparent 30%),
         radial-gradient(circle at 80% 70%, rgba(193, 122, 62, 0.04) 0%, transparent 40%),
@@ -63,7 +62,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Headings use the elegant Fraunces serif */
     h1, h2, h3, h4, .insight-title, .card-header h2 {
       font-family: 'Fraunces', serif;
       font-weight: 600;
@@ -371,12 +369,8 @@
       font-size: 1.2rem;
       font-weight: 600;
       color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
-    /* Chart container with subtle background */
     .chart-container {
       position: relative;
       height: 280px;
@@ -448,7 +442,6 @@
       font-weight: 500;
     }
 
-    /* ----- RESPONSIVE BREAKPOINTS ----- */
     @media (max-width: 960px) {
       .chart-grid,
       .side-by-side {
@@ -477,7 +470,6 @@
   </style>
 </head>
 <body>
-  <!-- Floating navigation bar -->
   <nav class="navbar">
     <div class="nav-brand">
       <div class="leaf-icon"><i class="fas fa-leaf"></i></div>
@@ -492,13 +484,11 @@
   </nav>
 
   <div class="dashboard">
-    <!-- Page header -->
     <div class="page-title">
       <h1><span id="countryNameDisplay">Country</span> Analysis</h1>
       <div class="subtitle">Deep dive into emissions, economy, and energy profile</div>
     </div>
 
-    <!-- Filter panel: country selector + decade filter -->
     <div class="filter-panel">
       <div class="filter-group">
         <span class="filter-label"><i class="fas fa-flag"></i> Country</span>
@@ -519,7 +509,6 @@
       </div>
     </div>
 
-    <!-- KPI cards for selected country -->
     <div class="kpi-grid">
       <div class="kpi-card"><div class="kpi-label">Total Emissions</div><div class="kpi-value" id="kpiEmissions">—</div><div class="kpi-meta" id="kpiEmissionsTrend"></div></div>
       <div class="kpi-card"><div class="kpi-label">Per Capita</div><div class="kpi-value" id="kpiPerCapita">—</div><div class="kpi-meta" id="kpiPerCapitaMeta">tonnes/person</div></div>
@@ -527,49 +516,48 @@
       <div class="kpi-card"><div class="kpi-label">Emission Intensity</div><div class="kpi-value" id="kpiIntensity">—</div><div class="kpi-meta">t per $M GDP</div></div>
     </div>
 
-    <!-- Dynamic insight panel -->
     <div class="insight-panel">
       <div class="insight-title">Key Insights</div>
-          <div class="insight-content" id="countryInsights"></div>
+      <div class="insight-content" id="countryInsights"></div>
     </div>
 
-    <!-- Chart grid -->
     <div class="chart-grid">
-      <!-- Emissions trend chart -->
       <div class="chart-card">
-        <div class="card-header"><h2>CO₂ Emissions Trend</h2></div>        <div class="chart-container" id="emissionsContainer">
+        <div class="card-header"><h2>CO₂ Emissions Trend</h2></div>
+        <div class="chart-container" id="emissionsContainer">
           <canvas id="emissionsChart"></canvas>
           <div class="loading-overlay" id="emissionsLoading"><div class="spinner"></div></div>
         </div>
       </div>
 
-      <!-- Per capita trend chart -->
       <div class="chart-card">
-        <div class="card-header"><h2>CO₂ Per Capita Trend</h2></div>        <div class="chart-container" id="perCapitaContainer">
+        <div class="card-header"><h2>CO₂ Per Capita Trend</h2></div>
+        <div class="chart-container" id="perCapitaContainer">
           <canvas id="perCapitaChart"></canvas>
           <div class="loading-overlay" id="perCapitaLoading"><div class="spinner"></div></div>
         </div>
       </div>
 
-      <!-- Energy mix stacked bar chart -->
       <div class="chart-card">
-        <div class="card-header"><h2>Energy Mix Over Time</h2></div>        <div class="chart-container" id="energyContainer">
+        <div class="card-header"><h2>Energy Mix Over Time</h2></div>
+        <div class="chart-container" id="energyContainer">
           <canvas id="energyMixChart"></canvas>
           <div class="loading-overlay" id="energyLoading"><div class="spinner"></div></div>
         </div>
       </div>
 
-      <!-- Side-by-side: GDP scatter + continent comparison -->
       <div class="chart-card full-width">
         <div class="side-by-side">
           <div>
-            <div class="card-header"><h2>GDP vs Emissions</h2></div>            <div class="chart-container" id="gdpContainer">
+            <div class="card-header"><h2>GDP vs Emissions</h2></div>
+            <div class="chart-container" id="gdpContainer">
               <canvas id="gdpScatterChart"></canvas>
               <div class="loading-overlay" id="gdpLoading"><div class="spinner"></div></div>
             </div>
           </div>
           <div>
-            <div class="card-header"><h2>Country vs Continent Average</h2></div>            <div class="chart-container" id="continentContainer">
+            <div class="card-header"><h2>Country vs Continent Average</h2></div>
+            <div class="chart-container" id="continentContainer">
               <canvas id="continentComparisonChart"></canvas>
               <div class="loading-overlay" id="continentLoading"><div class="spinner"></div></div>
             </div>
@@ -583,7 +571,6 @@
 
   <script>
     (function() {
-      // ---------- CONFIGURATION ----------
       const API = 'https://carbon-api-7its.onrender.com/api';
       const urlParams = new URLSearchParams(window.location.search);
       let selectedCountry = urlParams.get('country') || 'india';
@@ -592,16 +579,13 @@
       let currentDecade = 'all';
       let continentName = 'asia';
 
-      // Chart instances
       let emissionsChart, perCapitaChart, energyChart, gdpScatterChart, continentCompChart;
 
-      // ---------- UTILITY FUNCTIONS ----------
       const $ = id => document.getElementById(id);
       const showLoader = id => $(id)?.classList.add('visible');
       const hideLoader = id => $(id)?.classList.remove('visible');
       const destroy = inst => { try { if(inst) inst.destroy(); } catch(_){} };
 
-      /** Format large numbers with K/M/B/T suffixes */
       function formatNum(n, d=1) {
         if (n == null || isNaN(n)) return '—';
         if (n >= 1e12) return (n/1e12).toFixed(d)+'T';
@@ -611,21 +595,18 @@
         return n.toFixed(d);
       }
 
-      /** Fetch JSON from the backend API */
       async function api(endpoint) {
         const res = await fetch(API + endpoint);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       }
 
-      /** Filter data to the currently selected decade */
       function filterByDecade(data, key='year') {
         if (currentDecade === 'all') return data;
         const s = parseInt(currentDecade);
         return data.filter(d => d[key] >= s && d[key] < s+10);
       }
 
-      /** Load the continent for the selected country */
       async function loadMeta() {
         try {
           const meta = await api('/countries-with-continent');
@@ -634,7 +615,6 @@
         } catch(e) { console.warn('Continent info unavailable'); }
       }
 
-      // ---------- COUNTRY DROPDOWN ----------
       async function populateCountryDropdown() {
         try {
           const countries = await api('/countries');
@@ -656,44 +636,39 @@
         refreshAll();
       }
 
-      // ---------- DYNAMIC INSIGHTS ----------
       function updateCountryInsights(country) {
         const insights = {
           'india': [
-            { icon: 'chart-line', text: '<strong>Rapid emissions growth</strong> — CO₂ output has risen 17× since 1965.' },
-            { icon: 'user', text: '<strong>Low per‑capita emissions</strong> — ~1.9 tonnes/person, far below global average.' },
-            { icon: 'solar-panel', text: '<strong>Renewable share modest but growing</strong> — ~8% of energy mix.' },
-            { icon: 'industry', text: '<strong>Emission intensity improving</strong> — CO₂ per $M GDP down 40% since 1990.' }
+            '<strong>Rapid emissions growth</strong> — CO₂ output has risen 17× since 1965.',
+            '<strong>Low per‑capita emissions</strong> — ~1.9 tonnes/person, far below global average.',
+            '<strong>Renewable share modest but growing</strong> — ~8% of energy mix.',
+            '<strong>Emission intensity improving</strong> — CO₂ per $M GDP down 40% since 1990.'
           ],
           'china': [
-            { icon: 'chart-line', text: '<strong>Historic emissions surge</strong> — Became largest emitter mid‑2000s.' },
-            { icon: 'user', text: '<strong>Per‑capita plateaued</strong> — ~7–8 tonnes/person.' },
-            { icon: 'solar-panel', text: '<strong>Renewable leader in absolute terms</strong> — Largest solar/wind capacity.' },
-            { icon: 'industry', text: '<strong>Intensity falling rapidly</strong> — CO₂ per $M GDP halved since 2000.' }
+            '<strong>Historic emissions surge</strong> — Became largest emitter mid‑2000s.',
+            '<strong>Per‑capita plateaued</strong> — ~7–8 tonnes/person.',
+            '<strong>Renewable leader in absolute terms</strong> — Largest solar/wind capacity.',
+            '<strong>Intensity falling rapidly</strong> — CO₂ per $M GDP halved since 2000.'
           ],
           'united states': [
-            { icon: 'chart-line', text: '<strong>Emissions peaked in 2007</strong> — Declining due to coal‑to‑gas and renewables.' },
-            { icon: 'user', text: '<strong>High per‑capita</strong> — ~14–15 tonnes/person.' },
-            { icon: 'solar-panel', text: '<strong>Renewable share growing</strong> — Wind/solar >12% of electricity.' },
-            { icon: 'industry', text: '<strong>Strong decoupling</strong> — GDP up, emissions down.' }
+            '<strong>Emissions peaked in 2007</strong> — Declining due to coal‑to‑gas and renewables.',
+            '<strong>High per‑capita</strong> — ~14–15 tonnes/person.',
+            '<strong>Renewable share growing</strong> — Wind/solar >12% of electricity.',
+            '<strong>Strong decoupling</strong> — GDP up, emissions down.'
           ]
         };
         const generic = [
-          { icon: 'chart-line', text: '<strong>Emissions trajectory varies</strong> — Compare with continent average.' },
-          { icon: 'user', text: '<strong>Per‑capita reflects lifestyle/energy mix</strong> — Wealthier nations higher.' },
-          { icon: 'bolt', text: '<strong>Energy mix composition</strong> — Higher renewable share = lower intensity.' },
-          { icon: 'globe', text: '<strong>Continent comparison</strong> — See regional performance.' }
+          '<strong>Emissions trajectory varies</strong> — Compare with continent average.',
+          '<strong>Per‑capita reflects lifestyle/energy mix</strong> — Wealthier nations higher.',
+          '<strong>Energy mix composition</strong> — Higher renewable share = lower intensity.',
+          '<strong>Continent comparison</strong> — See regional performance.'
         ];
         const items = insights[country.toLowerCase()] || generic;
-        $('countryInsights').innerHTML = items.map(i => `
-          <div class="insight-item"><div class="insight-icon"></div><div class="insight-text">${i.text}</div></div>
+        $('countryInsights').innerHTML = items.map(text => `
+          <div class="insight-item"><div class="insight-icon"></div><div class="insight-text">${text}</div></div>
         `).join('');
-        $('insightCountryName').innerText = country;
       }
 
-      // ---------- CHART RENDERING FUNCTIONS ----------
-
-      /** Emissions trend line chart */
       async function drawEmissions() {
         showLoader('emissionsLoading');
         try {
@@ -725,7 +700,6 @@
         } finally { hideLoader('emissionsLoading'); }
       }
 
-      /** Per-capita trend line chart */
       async function drawPerCapita() {
         showLoader('perCapitaLoading');
         try {
@@ -751,7 +725,6 @@
         } finally { hideLoader('perCapitaLoading'); }
       }
 
-      /** Energy mix stacked bar chart */
       async function drawEnergyMix() {
         showLoader('energyLoading');
         try {
@@ -780,7 +753,6 @@
         } finally { hideLoader('energyLoading'); }
       }
 
-      /** GDP vs Emissions scatter plot */
       async function drawGdpScatter() {
         showLoader('gdpLoading');
         try {
@@ -811,7 +783,6 @@
         } finally { hideLoader('gdpLoading'); }
       }
 
-      /** Country vs continent average comparison line chart */
       async function drawContinentComparison() {
         showLoader('continentLoading');
         try {
@@ -843,7 +814,6 @@
         } finally { hideLoader('continentLoading'); }
       }
 
-      /** Update emission intensity KPI (alternative calculation) */
       async function updateCountryIntensityKPI() {
         try {
           const year = currentDecade === 'all' ? 2020 : Math.min(parseInt(currentDecade) + 9, 2022);
@@ -866,7 +836,6 @@
         }
       }
 
-      // ---------- ORCHESTRATION ----------
       async function refreshAll() {
         await loadMeta();
         updateCountryInsights(selectedCountry);
@@ -880,7 +849,6 @@
         updateCountryIntensityKPI();
       }
 
-      // ---------- INITIALIZATION ----------
       async function init() {
         await populateCountryDropdown();
         $('countrySelectHeader').addEventListener('change', e => handleCountryChange(e.target.value));
