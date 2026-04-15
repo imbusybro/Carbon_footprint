@@ -649,135 +649,149 @@
   }
 
   async function drawEmissions() {
-    showLoader('emissionsLoading');
-    try {
-      const data = await api(`/compare?countries=${encodeURIComponent(selectedCountry)}`);
-      const filtered = filterByDecade(data, 'year');
-      const canvas = $('emissionsChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      destroy(emissionsChart);
-      if (filtered.length === 0) throw new Error('No data');
-      emissionsChart = new Chart(ctx, {
-        type:'line', data:{ labels: filtered.map(d=>d.year), datasets:[{ label:'CO₂ (Mt)', data: filtered.map(d=>d.total_emissions), borderColor:'#1e4a3d', borderWidth:3, tension:0.2 }] },
-        options:{ responsive:true, maintainAspectRatio:false }
-      });
-      const latest = filtered[filtered.length-1];
-      const first = filtered[0];
-      $('kpiEmissions').innerText = formatNum(latest.total_emissions) + ' Mt';
-      if (first.total_emissions === 0) {
-        $('kpiEmissionsTrend').innerHTML = `+∞% vs ${first.year}`;
-      } else {
-        const pct = ((latest.total_emissions - first.total_emissions)/first.total_emissions*100).toFixed(1);
-        $('kpiEmissionsTrend').innerHTML = `${pct}% vs ${first.year}`;
-      }
-    } catch(e) {
-      $('emissionsContainer').innerHTML = '<div class="error-message">No emissions data</div>';
-    } finally { hideLoader('emissionsLoading'); }
-  }
+  showLoader('emissionsLoading');
+  try {
+    const data = await api(`/compare?countries=${encodeURIComponent(selectedCountry)}`);
+    console.log(`📊 Emissions for ${selectedCountry}:`, data.length, 'years');
+    const filtered = filterByDecade(data, 'year');
+    if (filtered.length === 0) throw new Error('No data for this decade');
+    const canvas = $('emissionsChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    destroy(emissionsChart);
+    emissionsChart = new Chart(ctx, {
+      type:'line', data:{ labels: filtered.map(d=>d.year), datasets:[{ label:'CO₂ (Mt)', data: filtered.map(d=>d.total_emissions), borderColor:'#1e4a3d', borderWidth:3, tension:0.2 }] },
+      options:{ responsive:true, maintainAspectRatio:false }
+    });
+    const latest = filtered[filtered.length-1], first = filtered[0];
+    $('kpiEmissions').innerText = formatNum(latest.total_emissions) + ' Mt';
+    if (first.total_emissions === 0) {
+      $('kpiEmissionsTrend').innerHTML = `+∞% vs ${first.year}`;
+    } else {
+      const pct = ((latest.total_emissions - first.total_emissions)/first.total_emissions*100).toFixed(1);
+      $('kpiEmissionsTrend').innerHTML = `${pct}% vs ${first.year}`;
+    }
+  } catch(e) {
+    console.warn('Emissions chart error:', e);
+    $('emissionsContainer').innerHTML = '<div class="error-message">No emissions data for this period</div>';
+    $('kpiEmissions').innerText = '—';
+    $('kpiEmissionsTrend').innerHTML = '';
+  } finally { hideLoader('emissionsLoading'); }
+}
 
-  async function drawPerCapita() {
-    showLoader('perCapitaLoading');
-    try {
-      const data = await api(`/per-capita-trend/${encodeURIComponent(selectedCountry)}`);
-      const filtered = filterByDecade(data, 'year').filter(d => d.co2_per_capita_tonnes != null);
-      const canvas = $('perCapitaChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      destroy(perCapitaChart);
-      if (filtered.length === 0) throw new Error('No data');
-      perCapitaChart = new Chart(ctx, {
-        type:'line', data:{ labels: filtered.map(d=>d.year), datasets:[{ label:'Tonnes/person', data: filtered.map(d=>d.co2_per_capita_tonnes), borderColor:'#c17a3e', borderWidth:3, fill:true, tension:0.2 }] },
-        options:{ responsive:true }
-      });
-      const latest = filtered[filtered.length-1];
-      $('kpiPerCapita').innerText = latest.co2_per_capita_tonnes.toFixed(2);
-      $('kpiPerCapitaMeta').innerHTML = `tonnes/person (${latest.year})`;
-    } catch(e) {
-      $('perCapitaContainer').innerHTML = '<div class="error-message">No per-capita data</div>';
-    } finally { hideLoader('perCapitaLoading'); }
-  }
+async function drawPerCapita() {
+  showLoader('perCapitaLoading');
+  try {
+    const data = await api(`/per-capita-trend/${encodeURIComponent(selectedCountry)}`);
+    console.log(`👤 Per-capita for ${selectedCountry}:`, data.length, 'years');
+    const filtered = filterByDecade(data, 'year').filter(d => d.co2_per_capita_tonnes != null);
+    if (filtered.length === 0) throw new Error('No data for this decade');
+    const canvas = $('perCapitaChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    destroy(perCapitaChart);
+    perCapitaChart = new Chart(ctx, {
+      type:'line', data:{ labels: filtered.map(d=>d.year), datasets:[{ label:'Tonnes/person', data: filtered.map(d=>d.co2_per_capita_tonnes), borderColor:'#c17a3e', borderWidth:3, fill:true, tension:0.2 }] },
+      options:{ responsive:true }
+    });
+    const latest = filtered[filtered.length-1];
+    $('kpiPerCapita').innerText = latest.co2_per_capita_tonnes.toFixed(2);
+    $('kpiPerCapitaMeta').innerHTML = `tonnes/person (${latest.year})`;
+  } catch(e) {
+    console.warn('Per-capita chart error:', e);
+    $('perCapitaContainer').innerHTML = '<div class="error-message">No per‑capita data for this period</div>';
+    $('kpiPerCapita').innerText = '—';
+  } finally { hideLoader('perCapitaLoading'); }
+}
 
-  async function drawEnergyMix() {
-    showLoader('energyLoading');
-    try {
-      const data = await api(`/energy-mix/${encodeURIComponent(selectedCountry)}`);
-      const filtered = filterByDecade(data, 'year').filter(d => (d.fossil||0)+(d.renewable||0) > 0);
-      const canvas = $('energyMixChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      destroy(energyChart);
-      if (filtered.length === 0) throw new Error('No data');
-      energyChart = new Chart(ctx, {
-        type:'bar', data:{ labels: filtered.map(d=>d.year), datasets:[
-          { label:'Fossil', data: filtered.map(d=>d.fossil), backgroundColor:'#c94040', stack:'e' },
-          { label:'Renewable', data: filtered.map(d=>d.renewable), backgroundColor:'#1e4a3d', stack:'e' }
-        ]},
-        options:{ responsive:true, scales:{ x:{stacked:true}, y:{stacked:true} } }
-      });
-      const latest = filtered[filtered.length-1];
-      const total = (latest.fossil||0)+(latest.renewable||0);
-      $('kpiRenewable').innerText = total ? ((latest.renewable/total)*100).toFixed(1)+'%' : '—';
-    } catch(e) {
-      $('energyContainer').innerHTML = '<div class="error-message">No energy data</div>';
-    } finally { hideLoader('energyLoading'); }
-  }
+async function drawEnergyMix() {
+  showLoader('energyLoading');
+  try {
+    const data = await api(`/energy-mix/${encodeURIComponent(selectedCountry)}`);
+    console.log(`⚡ Energy mix for ${selectedCountry}:`, data.length, 'years');
+    const filtered = filterByDecade(data, 'year').filter(d => (d.fossil||0)+(d.renewable||0) > 0);
+    if (filtered.length === 0) throw new Error('No data for this decade');
+    const canvas = $('energyMixChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    destroy(energyChart);
+    energyChart = new Chart(ctx, {
+      type:'bar', data:{ labels: filtered.map(d=>d.year), datasets:[
+        { label:'Fossil', data: filtered.map(d=>d.fossil), backgroundColor:'#c94040', stack:'e' },
+        { label:'Renewable', data: filtered.map(d=>d.renewable), backgroundColor:'#1e4a3d', stack:'e' }
+      ]},
+      options:{ responsive:true, scales:{ x:{stacked:true}, y:{stacked:true} } }
+    });
+    const latest = filtered[filtered.length-1];
+    const total = (latest.fossil||0)+(latest.renewable||0);
+    $('kpiRenewable').innerText = total ? ((latest.renewable/total)*100).toFixed(1)+'%' : '—';
+  } catch(e) {
+    console.warn('Energy mix error:', e);
+    $('energyContainer').innerHTML = '<div class="error-message">No energy data for this period</div>';
+    $('kpiRenewable').innerText = '—';
+  } finally { hideLoader('energyLoading'); }
+}
 
-  async function drawGdpScatter() {
-    showLoader('gdpLoading');
-    try {
-      const [emData, gdpData] = await Promise.all([
-        api(`/compare?countries=${encodeURIComponent(selectedCountry)}`),
-        api('/gdp-co2')
-      ]);
-      const filteredEm = filterByDecade(emData, 'year');
-      const filteredGdp = filterByDecade(gdpData, 'year').filter(d => d.country_name?.toLowerCase() === selectedCountry.toLowerCase());
-      const emMap = Object.fromEntries(filteredEm.map(d => [d.year, d.total_emissions]));
-      const merged = filteredGdp.map(d => ({ year:d.year, gdp:d.gdp, emissions:emMap[d.year] })).filter(d => d.emissions != null && d.gdp > 0);
-      const canvas = $('gdpScatterChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      destroy(gdpScatterChart);
-      if (merged.length === 0) throw new Error('No data');
-      gdpScatterChart = new Chart(ctx, {
-        type:'scatter', data:{ datasets:[{ label:selectedCountry, data: merged.map(d=>({x:d.gdp, y:d.emissions})), backgroundColor:'#a03ea8', pointRadius:5 }] },
-        options:{ scales:{ x:{type:'logarithmic', title:{display:true, text:'GDP (USD)'}}, y:{type:'logarithmic', title:{display:true, text:'CO₂ (Mt)'}} } }
-      });
-      const latest = merged[merged.length-1];
-      $('kpiIntensity').innerText = ((latest.emissions * 1e12) / latest.gdp).toFixed(2);
-    } catch(e) {
-      $('gdpContainer').innerHTML = '<div class="error-message">No GDP data</div>';
-    } finally { hideLoader('gdpLoading'); }
-  }
+async function drawGdpScatter() {
+  showLoader('gdpLoading');
+  try {
+    const [emData, gdpData] = await Promise.all([
+      api(`/compare?countries=${encodeURIComponent(selectedCountry)}`),
+      api('/gdp-co2')
+    ]);
+    const filteredEm = filterByDecade(emData, 'year');
+    const filteredGdp = filterByDecade(gdpData, 'year').filter(d => d.country_name?.toLowerCase() === selectedCountry.toLowerCase());
+    const emMap = Object.fromEntries(filteredEm.map(d => [d.year, d.total_emissions]));
+    const merged = filteredGdp.map(d => ({ year:d.year, gdp:d.gdp, emissions:emMap[d.year] })).filter(d => d.emissions != null && d.gdp > 0);
+    console.log(`📈 GDP scatter for ${selectedCountry}:`, merged.length, 'points');
+    if (merged.length === 0) throw new Error('No overlapping GDP/emissions data');
+    const canvas = $('gdpScatterChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    destroy(gdpScatterChart);
+    gdpScatterChart = new Chart(ctx, {
+      type:'scatter', data:{ datasets:[{ label:selectedCountry, data: merged.map(d=>({x:d.gdp, y:d.emissions})), backgroundColor:'#a03ea8', pointRadius:5 }] },
+      options:{ scales:{ x:{type:'logarithmic', title:{display:true, text:'GDP (USD)'}}, y:{type:'logarithmic', title:{display:true, text:'CO₂ (Mt)'}} } }
+    });
+    const latest = merged[merged.length-1];
+    $('kpiIntensity').innerText = ((latest.emissions * 1e12) / latest.gdp).toFixed(2);
+  } catch(e) {
+    console.warn('GDP scatter error:', e);
+    $('gdpContainer').innerHTML = '<div class="error-message">No GDP data for this period</div>';
+    $('kpiIntensity').innerText = '—';
+  } finally { hideLoader('gdpLoading'); }
+}
 
-  async function drawContinentComparison() {
-    showLoader('continentLoading');
-    try {
-      if (!continentName) throw new Error('Continent unknown');
-      const [countryData, continentData] = await Promise.all([
-        api(`/compare?countries=${encodeURIComponent(selectedCountry)}`),
-        api(`/continent-average/${encodeURIComponent(continentName)}`)
-      ]);
-      const filteredCountry = filterByDecade(countryData, 'year');
-      const filteredContinent = filterByDecade(continentData, 'year');
-      const countryMap = Object.fromEntries(filteredCountry.map(d => [d.year, d.total_emissions]));
-      const combined = filteredContinent.map(d => ({ year:d.year, country:countryMap[d.year], avg:d.avg_emissions })).filter(d => d.country != null);
-      const canvas = $('continentComparisonChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      destroy(continentCompChart);
-      if (combined.length === 0) throw new Error('No data');
-      continentCompChart = new Chart(ctx, {
-        type:'line', data:{ labels: combined.map(d=>d.year), datasets:[
-          { label:selectedCountry, data: combined.map(d=>d.country), borderColor:'#1e4a3d', borderWidth:3 },
-          { label:`${continentName} avg`, data: combined.map(d=>d.avg), borderColor:'#94a3b8', borderDash:[5] }
-        ]},
-        options:{ responsive:true }
-      });
-    } catch(e) {
-      $('continentContainer').innerHTML = '<div class="error-message">Continent comparison unavailable</div>';
-    } finally { hideLoader('continentLoading'); }
-  }
+async function drawContinentComparison() {
+  showLoader('continentLoading');
+  try {
+    if (!continentName) throw new Error('Continent unknown');
+    const [countryData, continentData] = await Promise.all([
+      api(`/compare?countries=${encodeURIComponent(selectedCountry)}`),
+      api(`/continent-average/${encodeURIComponent(continentName)}`)
+    ]);
+    const filteredCountry = filterByDecade(countryData, 'year');
+    const filteredContinent = filterByDecade(continentData, 'year');
+    const countryMap = Object.fromEntries(filteredCountry.map(d => [d.year, d.total_emissions]));
+    const combined = filteredContinent.map(d => ({ year:d.year, country:countryMap[d.year], avg:d.avg_emissions })).filter(d => d.country != null);
+    console.log(`🌍 Continent comparison:`, combined.length, 'years');
+    if (combined.length === 0) throw new Error('No overlapping data');
+    const canvas = $('continentComparisonChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    destroy(continentCompChart);
+    continentCompChart = new Chart(ctx, {
+      type:'line', data:{ labels: combined.map(d=>d.year), datasets:[
+        { label:selectedCountry, data: combined.map(d=>d.country), borderColor:'#1e4a3d', borderWidth:3 },
+        { label:`${continentName} avg`, data: combined.map(d=>d.avg), borderColor:'#94a3b8', borderDash:[5] }
+      ]},
+      options:{ responsive:true }
+    });
+  } catch(e) {
+    console.warn('Continent comparison error:', e);
+    $('continentContainer').innerHTML = '<div class="error-message">Continent comparison unavailable</div>';
+  } finally { hideLoader('continentLoading'); }
+}
 
   async function updateCountryIntensityKPI() {
     try {
