@@ -954,108 +954,143 @@
     // 3. Intensity bar chart – FIXED VERSION
     // --------------------------------------------------------------
     async function drawIntensityChart() {
-      showLoader('intensityLoading');
-      try {
-        // Ensure we have GDP data
-        if (!allGdpData || allGdpData.length === 0) {
-          allGdpData = await api('/gdp-co2');
-          console.log('📊 Fetched GDP data:', allGdpData.length, 'rows');
-        }
-        
-        let filteredGdp = filterByDecade(allGdpData, 'year');
-        if (filteredGdp.length === 0) {
-          console.warn('No GDP data for selected decade, using all-time data');
-          filteredGdp = allGdpData;
-        }
-        
-        // Find the most recent year with data
-        const latestYear = filteredGdp.length ? Math.max(...filteredGdp.map(d=>d.year)) : 2020;
-        console.log('📅 Using year:', latestYear);
-        
-        const recent = filteredGdp.filter(d => d.year === latestYear);
-        console.log(`📈 Recent GDP rows (${latestYear}):`, recent.length);
-        
-        const intensities = [];
-        for (let d of recent) {
-          const country = d.country_name;
-          if (!country) continue;
-          
-          try {
-            const emData = await api(`/compare?countries=${encodeURIComponent(country)}`);
-            const emFiltered = filterByDecade(emData, 'year');
-            const sourceEm = emFiltered.length ? emFiltered : emData;
-            const latestEm = sourceEm.find(e => e.year === latestYear)?.total_emissions;
-            
-            if (latestEm && d.gdp > 0) {
-              const intensity = (latestEm * 1e12) / d.gdp;
-              intensities.push({ 
-                country, 
-                intensity, 
-                continent: countryContinent[country.toLowerCase()] || 'Other' 
-              });
-            }
-          } catch (err) {
-            // skip individual country errors
+  showLoader('intensityLoading');
+  try {
+    console.log('🔥 Starting intensity chart...');
+    
+    // Ensure GDP data exists
+    if (!allGdpData || allGdpData.length === 0) {
+      console.log('📊 Fetching GDP data...');
+      allGdpData = await api('/gdp-co2');
+      console.log('📊 GDP rows:', allGdpData.length);
+    }
+    
+    // Get all available years for reference
+    const allYears = [...new Set(allGdpData.map(d => d.year))].sort();
+    console.log('📅 All years in GDP data:', allYears.slice(0,5), '...', allYears.slice(-5));
+    
+    // Apply decade filter
+    let filteredGdp = filterByDecade(allGdpData, 'year');
+    console.log('📅 After decade filter (', currentDecade, '):', filteredGdp.length, 'rows');
+    
+    if (filteredGdp.length === 0) {
+      console.warn('⚠️ No GDP data for selected decade, using all-time data');
+      filteredGdp = allGdpData;
+    }
+    
+    // Find the most recent year WITH actual GDP values
+    const yearsWithGdp = [...new Set(filteredGdp.filter(d => d.gdp > 0).map(d => d.year))];
+    const latestYear = yearsWithGdp.length ? Math.max(...yearsWithGdp) : 2020;
+    console.log('📅 Using latest year with GDP:', latestYear);
+    
+    // Filter to that year only
+    const recent = filteredGdp.filter(d => d.year === latestYear && d.gdp > 0);
+    console.log(`📈 Countries with GDP in ${latestYear}:`, recent.length);
+    
+    if (recent.length === 0) {
+      throw new Error(`No countries have GDP data for ${latestYear}`);
+    }
+    
+    // Also fetch emissions for all countries in parallel (much faster)
+    const countryNames = recent.map(d => d.country_name).filter(Boolean);
+    console.log(`🌍 Fetching emissions for ${countryNames.length} countries...`);
+    
+    // Create a map of emissions by country for the target year
+    const emissionsMap = new Map();
+    
+    // Process in batches to avoid overwhelming the API
+    const batchSize = 10;
+    for (let i = 0; i < countryNames.length; i += batchSize) {
+      const batch = countryNames.slice(i, i + batchSize);
+      await Promise.all(batch.map(async (country) => {
+        try {
+          const emData = await api(`/compare?countries=${encodeURIComponent(country)}`);
+          // Find the emissions for our target year (or closest)
+          const targetEm = emData.find(e => e.year === latestYear)?.total_emissions;
+          if (targetEm !== undefined && targetEm !== null) {
+            emissionsMap.set(country, targetEm);
           }
+        } catch (e) {
+          // skip
         }
-        
-        console.log(`🔥 Calculated intensities for ${intensities.length} countries`);
-        
-        const top15 = intensities.sort((a,b)=> b.intensity - a.intensity).slice(0,15);
-        console.log('🏆 Top 15 intensity:', top15);
-        
-        if (top15.length === 0) throw new Error('No intensity data could be calculated');
-        
-        const canvas = $('intensityChart');
-        if (!canvas) throw new Error('Canvas not found');
-        const ctx = canvas.getContext('2d');
-        destroy(intensityChart);
-        
-        intensityChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: top15.map(d => d.country),
-            datasets: [{
-              label: 'Tonnes CO₂ per $M GDP',
-              data: top15.map(d => d.intensity),
-              backgroundColor: top15.map(d => CONT_COLORS[d.continent] || '#7a927a'),
-              borderRadius: 6
-            }]
-          },
-          options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: '#1e2e24',
-                callbacks: {
-                  label: (ctx) => ` ${ctx.raw.toFixed(2)} t/$M GDP`,
-                  afterLabel: (ctx) => `Continent: ${top15[ctx.dataIndex].continent}`
-                }
-              }
-            },
-            scales: {
-              x: {
-                grid: { color: '#eef1ec' },
-                ticks: { color: '#7a927a' }
-              },
-              y: {
-                grid: { display: false },
-                ticks: { color: '#4a5e47', font: { size: 11 } }
-              }
-            }
-          }
-        });
-        console.log('✅ Intensity chart rendered');
-      } catch(e) {
-        console.error('❌ Intensity chart error:', e);
-        $('intensityContainer').innerHTML = '<div class="error-message">No intensity data available for this period</div>';
-      } finally {
-        hideLoader('intensityLoading');
+      }));
+    }
+    console.log('🌍 Emissions map size:', emissionsMap.size);
+    
+    // Build intensities array
+    const intensities = [];
+    for (let d of recent) {
+      const country = d.country_name;
+      if (!country) continue;
+      
+      const emissions = emissionsMap.get(country);
+      if (emissions && d.gdp > 0) {
+        const intensity = (emissions * 1e12) / d.gdp;
+        const continent = countryContinent[country.toLowerCase()] || 'Other';
+        intensities.push({ country, intensity, continent });
       }
     }
+    
+    console.log(`🔥 Calculated intensities for ${intensities.length} countries`);
+    
+    // Sort and take top 15
+    const top15 = intensities.sort((a,b) => b.intensity - a.intensity).slice(0,15);
+    console.log('🏆 Top 15:', top15.map(d => `${d.country}: ${d.intensity.toFixed(2)}`));
+    
+    if (top15.length === 0) {
+      throw new Error('No intensity data could be calculated (emissions missing?)');
+    }
+    
+    const canvas = $('intensityChart');
+    if (!canvas) throw new Error('Canvas not found');
+    const ctx = canvas.getContext('2d');
+    destroy(intensityChart);
+    
+    intensityChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: top15.map(d => d.country),
+        datasets: [{
+          label: 'Tonnes CO₂ per $M GDP',
+          data: top15.map(d => d.intensity),
+          backgroundColor: top15.map(d => CONT_COLORS[d.continent] || '#7a927a'),
+          borderRadius: 6
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e2e24',
+            callbacks: {
+              label: (ctx) => ` ${ctx.raw.toFixed(2)} t/$M GDP`,
+              afterLabel: (ctx) => `Continent: ${top15[ctx.dataIndex].continent}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#eef1ec' },
+            ticks: { color: '#7a927a' }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: '#4a5e47', font: { size: 11 } }
+          }
+        }
+      }
+    });
+    console.log('✅ Intensity chart rendered');
+  } catch(e) {
+    console.error('❌ Intensity chart error:', e);
+    $('intensityContainer').innerHTML = '<div class="error-message">No intensity data available for this period</div>';
+  } finally {
+    hideLoader('intensityLoading');
+  }
+}
   
     init();
   })();
