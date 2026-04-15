@@ -610,10 +610,14 @@
   const API = 'https://carbon-api-7its.onrender.com/api';
   const CONTINENTS = ['africa','asia','europe','north america','south america','oceania'];
   const CONT_COLORS = {
-    'africa':'#f59e0b','asia':'#3b82f6','europe':'#8b5cf6','north america':'#ef4444','south america':'#10b981','oceania':'#f97316'
-  };
-  const LINE_COLORS = ['#1e4a3d','#3b82f6','#c17a3e','#8b5cf6','#ef4444'];
-  const MAX_SEL = 5;
+  'africa':        '#c17a3e',   // clay
+  'asia':          '#1e4a3d',   // accent
+  'europe':        '#3a7d7d',   // teal
+  'north america': '#2058a8',   // blue
+  'south america': '#6b8c5c',   // moss
+  'oceania':       '#c94040'    // red
+};
+const LINE_COLORS = ['#1e4a3d', '#2058a8', '#c17a3e', '#6b8c5c', '#c94040'];
 
   let allCountries = [], countryContinent = {}, allGdpData = [];
   let selectedEntities = ['china','france','finland','greece'];
