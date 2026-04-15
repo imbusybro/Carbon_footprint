@@ -145,14 +145,9 @@
       padding: 32px 24px;
     }
 
-    /* --- HEADER --- */
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 24px;
-      margin-bottom: 36px;
+    /* --- HEADER (simplified) --- */
+    .header-text {
+      margin-bottom: 28px;
     }
 
     .header-text h1 {
@@ -175,48 +170,206 @@
       font-weight: 400;
     }
 
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .decade-filter {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* --- FILTER PANEL (GDP‑style, now on overview) --- */
+    .filter-panel {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 60px;
-      padding: 6px 18px;
+      border-radius: var(--radius-lg);
+      padding: 22px 28px;
+      margin-bottom: 32px;
       box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: flex-end;
+      border: 1px solid var(--border);
     }
 
-    .decade-filter label {
-      font-size: 0.8rem;
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-muted);
-      white-space: nowrap;
     }
 
-    .decade-filter select,
-    .filter-bar select,
-    .country-selector-header select,
-    .styled-select,
-    .filter-select {
-      border: none;
-      background: transparent;
-      font-size: 0.95rem;
+    .filter-select,
+    .styled-select {
+      padding: 8px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      background: var(--surface);
+      font-size: 0.9rem;
       font-family: 'Work Sans', sans-serif;
       color: var(--text-primary);
       font-weight: 500;
       cursor: pointer;
       outline: none;
-      padding: 4px 8px;
-      border-radius: 30px;
+      min-width: 150px;
+    }
+
+    .entity-picker {
+      position: relative;
+      min-width: 280px;
+    }
+
+    .entity-search-input {
+      width: 100%;
+      padding: 10px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.9rem;
+      outline: none;
+      background: var(--surface);
+    }
+
+    .entity-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 200;
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+
+    .entity-dropdown.open {
+      display: block;
+    }
+
+    .checkbox-option,
+    .entity-option {
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--surface-2);
+    }
+
+    .checkbox-option:hover,
+    .entity-option:hover {
+      background: var(--surface-2);
+    }
+
+    .checkbox-option.disabled,
+    .entity-option.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .checkbox-option input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .entity-tags,
+    .selected-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 28px;
+    }
+
+    .entity-tag,
+    .country-tag {
+      background: var(--accent);
+      color: white;
+      padding: 5px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: tagIn 0.2s ease;
+      box-shadow: 0 2px 6px rgba(30, 74, 61, 0.15);
+    }
+
+    @keyframes tagIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .tag-remove,
+    .entity-tag .remove-tag {
+      cursor: pointer;
+      opacity: 0.7;
+      font-size: 0.7rem;
+      padding: 2px;
+      border-radius: 50%;
+      transition: opacity 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+    }
+
+    .tag-remove:hover,
+    .entity-tag .remove-tag:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: 40px;
+      border: none;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(30, 74, 61, 0.2);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+      transform: scale(1.02);
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .error-message {
+      color: var(--red);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
     }
 
     /* --- KPI CARDS --- */
@@ -370,211 +523,6 @@
     .chart-container canvas {
       max-height: 320px;
       width: 100% !important;
-    }
-
-    /* --- COUNTRY SELECTOR (SEARCHABLE) --- */
-    .comparison-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-    }
-
-    .selector-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .country-selector {
-      position: relative;
-      flex: 1;
-      min-width: 240px;
-    }
-
-    .search-input-wrapper {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid var(--border);
-      border-radius: 40px;
-      background: var(--surface);
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .search-input-wrapper:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(30, 74, 61, 0.1);
-    }
-
-    .search-input-wrapper i {
-      padding: 0 14px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .search-box {
-      flex: 1;
-      border: none;
-      outline: none;
-      padding: 10px 10px 10px 0;
-      font-size: 0.9rem;
-      font-family: 'Work Sans', sans-serif;
-      color: var(--text-primary);
-      background: transparent;
-    }
-
-    .search-box::placeholder {
-      color: var(--text-muted);
-    }
-
-    .checkbox-dropdown {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      max-height: 260px;
-      overflow-y: auto;
-      z-index: 1000;
-      box-shadow: var(--shadow-lg);
-      display: none;
-    }
-
-    .checkbox-dropdown::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .checkbox-dropdown::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 10px;
-    }
-
-    .checkbox-option {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid var(--surface-2);
-      transition: background 0.1s;
-      font-size: 0.9rem;
-      gap: 10px;
-    }
-
-    .checkbox-option:last-child {
-      border-bottom: none;
-    }
-
-    .checkbox-option:hover {
-      background: var(--surface-2);
-    }
-
-    .checkbox-option input[type="checkbox"] {
-      accent-color: var(--accent);
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .checkbox-option label {
-      cursor: pointer;
-      flex: 1;
-      color: var(--text-primary);
-    }
-
-    .selected-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 28px;
-    }
-
-    .country-tag,
-    .entity-tag {
-      background: var(--accent);
-      color: white;
-      padding: 5px 14px;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      animation: tagIn 0.2s ease;
-      box-shadow: 0 2px 6px rgba(30, 74, 61, 0.15);
-    }
-
-    @keyframes tagIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .tag-remove {
-      cursor: pointer;
-      opacity: 0.7;
-      font-size: 0.7rem;
-      padding: 2px;
-      border-radius: 50%;
-      transition: opacity 0.15s, background 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 16px;
-      height: 16px;
-    }
-
-    .tag-remove:hover {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .action-btn {
-      padding: 10px 18px;
-      border-radius: 40px;
-      border: none;
-      font-family: 'Work Sans', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(30, 74, 61, 0.2);
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-dark);
-      transform: scale(1.02);
-    }
-
-    .btn-secondary {
-      background: var(--surface-2);
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-
-    .error-message {
-      color: var(--red);
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
     }
 
     /* --- INSIGHT PANEL --- */
@@ -735,7 +683,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* --- FOOTER & BACK LINK --- */
+    /* --- FOOTER --- */
     .footer {
       margin-top: 48px;
       text-align: center;
@@ -743,135 +691,6 @@
       color: var(--text-muted);
       padding: 24px 0;
       border-top: 1px solid var(--border);
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 24px;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      transition: gap 0.2s;
-    }
-
-    .back-link:hover {
-      gap: 12px;
-    }
-
-    /* --- FILTER PANEL (GDP PAGE) --- */
-    .filter-panel {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 22px 28px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      align-items: flex-start;
-      border: 1px solid var(--border);
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .filter-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-    }
-
-    .mode-toggle {
-      display: flex;
-      border: 1.5px solid var(--border);
-      border-radius: 40px;
-      overflow: hidden;
-    }
-
-    .mode-toggle label {
-      padding: 8px 18px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      background: var(--surface);
-      transition: all 0.15s;
-    }
-
-    .mode-toggle input[type=radio] {
-      display: none;
-    }
-
-    .mode-toggle input:checked + label {
-      background: var(--accent);
-      color: white;
-    }
-
-    .entity-picker {
-      position: relative;
-      min-width: 280px;
-    }
-
-    .entity-search-input {
-      width: 100%;
-      padding: 10px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 40px;
-      font-size: 0.9rem;
-      outline: none;
-      background: var(--surface);
-    }
-
-    .entity-dropdown {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      max-height: 240px;
-      overflow-y: auto;
-      z-index: 200;
-      box-shadow: var(--shadow-lg);
-      display: none;
-    }
-
-    .entity-dropdown.open {
-      display: block;
-    }
-
-    .entity-option {
-      padding: 10px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      border-bottom: 1px solid var(--surface-2);
-    }
-
-    .entity-option:hover {
-      background: var(--surface-2);
-    }
-
-    .entity-option.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* --- SIDE-BY-SIDE LAYOUT --- */
-    .side-by-side {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
     }
 
     /* --- RESPONSIVE --- */
@@ -882,8 +701,9 @@
       .chart-card.full-width {
         grid-column: 1;
       }
-      .header {
+      .filter-panel {
         flex-direction: column;
+        align-items: stretch;
       }
     }
 
@@ -896,9 +716,6 @@
       }
       .kpi-value {
         font-size: 1.8rem;
-      }
-      .side-by-side {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -920,26 +737,48 @@
 
 <div class="dashboard">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-text">
-      <h1>Global <span>CO₂</span> Overview</h1>
-      <div class="subtitle">Emissions · GDP Correlation · Energy Transition · Per Capita Analysis</div>
+  <!-- Page Title -->
+  <div class="header-text">
+    <h1>Global <span>CO₂</span> Overview</h1>
+    <div class="subtitle">Emissions · GDP Correlation · Energy Transition · Per Capita Analysis</div>
+  </div>
+
+  <!-- Unified Filter Panel (GDP‑style) -->
+  <div class="filter-panel">
+    <!-- Decade Filter -->
+    <div class="filter-group">
+      <span class="filter-label"><i class="fas fa-calendar-alt"></i> Decade</span>
+      <select class="filter-select" id="decadeFilter">
+        <option value="all">All Years</option>
+        <option value="1960">1960s</option>
+        <option value="1970">1970s</option>
+        <option value="1980">1980s</option>
+        <option value="1990">1990s</option>
+        <option value="2000">2000s</option>
+        <option value="2010">2010s</option>
+        <option value="2020">2020s</option>
+      </select>
     </div>
-    <div class="header-controls">
-      <div class="decade-filter">
-        <label><i class="fas fa-calendar-alt"></i>&nbsp; DECADE</label>
-        <select id="decadeFilter">
-          <option value="all">All Years</option>
-          <option value="1960">1960s</option>
-          <option value="1970">1970s</option>
-          <option value="1980">1980s</option>
-          <option value="1990">1990s</option>
-          <option value="2000">2000s</option>
-          <option value="2010">2010s</option>
-          <option value="2020">2020s</option>
-        </select>
+
+    <!-- Country Selector -->
+    <div class="filter-group" style="flex:1;">
+      <span class="filter-label"><i class="fas fa-flag"></i> Select Countries <span id="selCount" style="color:var(--accent);"></span></span>
+      <div class="entity-picker" id="countryPicker">
+        <input type="text" class="entity-search-input" id="countrySearch" placeholder="Search and select (up to 5)…" autocomplete="off">
+        <div class="entity-dropdown" id="countryCheckboxList"></div>
       </div>
+      <div class="entity-tags" id="selectedCountriesTags"></div>
+      <div id="comparisonError" class="error-message" style="display:none;"></div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="filter-group" style="justify-content: flex-end;">
+      <button class="action-btn btn-primary" id="applyComparisonBtn">
+        <i class="fas fa-sync-alt"></i> Update
+      </button>
+      <button class="action-btn btn-secondary" id="analyzeCountryBtn" style="margin-left:8px;">
+        <i class="fas fa-external-link-alt"></i> Analyze
+      </button>
     </div>
   </div>
 
@@ -1008,31 +847,12 @@
       </div>
     </div>
 
-    <!-- Country Comparison -->
+    <!-- Country Comparison (chart only) -->
     <div class="chart-card">
       <div class="card-header">
         <h2><span class="card-icon"><i class="fas fa-flag"></i></span> Country Comparison</h2>
-        <button class="action-btn btn-secondary" id="analyzeCountryBtn">
-          <i class="fas fa-external-link-alt"></i> Analyze
-        </button>
       </div>
-      <div class="comparison-controls">
-        <div class="selector-row">
-          <div class="country-selector" id="countrySelectorWrapper">
-            <div class="search-input-wrapper">
-              <i class="fas fa-search"></i>
-              <input type="text" class="search-box" id="countrySearch" placeholder="Search &amp; select countries…" autocomplete="off">
-            </div>
-            <div class="checkbox-dropdown" id="countryCheckboxList"></div>
-          </div>
-          <button class="action-btn btn-primary" id="applyComparisonBtn">
-            <i class="fas fa-sync-alt"></i> Update
-          </button>
-        </div>
-        <div class="selected-tags" id="selectedCountriesTags"></div>
-        <div id="comparisonError" class="error-message" style="display:none"></div>
-      </div>
-      <div class="chart-container" style="margin-top:12px;" id="comparisonContainer">
+      <div class="chart-container" id="comparisonContainer">
         <div class="chart-loading" id="comparisonLoading"><div class="spinner"></div> Loading…</div>
         <canvas id="comparisonChart"></canvas>
       </div>
@@ -1221,7 +1041,7 @@
   $('countrySearch').addEventListener('input', e => buildCheckboxList(e.target.value));
   $('countrySearch').addEventListener('focus', () => { $('countryCheckboxList').style.display='block'; });
   document.addEventListener('click', e => {
-    if (!e.target.closest('#countrySelectorWrapper')) $('countryCheckboxList').style.display='none';
+    if (!e.target.closest('#countryPicker')) $('countryCheckboxList').style.display='none';
   });
 
   function populateEnergyDropdown() {
