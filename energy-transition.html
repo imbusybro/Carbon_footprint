@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Energy Transition | Carbon Intelligence</title>
+  <title>EarthLens | Energy Transition</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,23 +61,23 @@
 
     /* ----- 导航栏 ----- */
     .navbar {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 60px;
-  padding: 6px 28px;
-  margin: 16px 24px 0;
-  width: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  position: sticky;
-  top: 16px;
-  z-index: 100;
-  box-shadow: 0 8px 24px rgba(30, 46, 36, 0.12);
-}
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 60px;
+      padding: 6px 28px;
+      margin: 16px 24px 0;
+      width: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(30, 46, 36, 0.12);
+    }
 
     .nav-brand {
       font-family: 'Fraunces', serif;
@@ -239,9 +239,7 @@
       display: none;
     }
 
-    .entity-dropdown.open {
-      display: block;
-    }
+    .entity-dropdown.open { display: block; }
 
     .checkbox-option {
       padding: 10px 18px;
@@ -253,14 +251,8 @@
       border-bottom: 1px solid var(--surface-2);
     }
 
-    .checkbox-option:hover {
-      background: var(--surface-2);
-    }
-
-    .checkbox-option.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    .checkbox-option:hover { background: var(--surface-2); }
+    .checkbox-option.disabled { opacity: 0.4; cursor: not-allowed; }
 
     .checkbox-option input[type="checkbox"] {
       accent-color: var(--accent);
@@ -381,23 +373,6 @@
     .kpi-card.red::before   { background: var(--red); }
     .kpi-card.blue::before  { background: var(--blue); }
 
-    .kpi-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .kpi-card.amber .kpi-icon { background: var(--clay-light); color: var(--clay); }
-    .kpi-card.red   .kpi-icon { background: var(--red-light);   color: var(--red); }
-    .kpi-card.blue  .kpi-icon { background: var(--blue-light);  color: var(--blue); }
-
     .kpi-label {
       font-size: 0.8rem;
       font-weight: 600;
@@ -438,9 +413,6 @@
       letter-spacing: 0.5px;
       color: var(--accent);
       margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .insight-content {
@@ -452,19 +424,6 @@
     .insight-item {
       display: flex;
       gap: 14px;
-    }
-
-    .insight-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--accent-light);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-size: 1rem;
-      flex-shrink: 0;
     }
 
     .insight-text {
@@ -499,9 +458,7 @@
       transform: translateY(-2px);
     }
 
-    .chart-card.full-width {
-      grid-column: 1 / -1;
-    }
+    .chart-card.full-width { grid-column: 1 / -1; }
 
     .card-header {
       display: flex;
@@ -516,9 +473,6 @@
       font-size: 1.2rem;
       font-weight: 600;
       color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .chart-container {
@@ -545,20 +499,7 @@
       margin-bottom: 24px;
     }
 
-    .one-col {
-      margin-bottom: 24px;
-    }
-
-    .selector-area {
-      margin-bottom: 20px;
-    }
-
-    .selector-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
+    .one-col { margin-bottom: 24px; }
 
     /* ----- 加载与错误状态 ----- */
     .loading-overlay {
@@ -576,9 +517,7 @@
       transition: opacity 0.2s;
     }
 
-    .loading-overlay.visible {
-      opacity: 1;
-    }
+    .loading-overlay.visible { opacity: 1; }
 
     .spinner {
       width: 22px;
@@ -619,26 +558,14 @@
 
     /* ----- 响应式 ----- */
     @media (max-width: 960px) {
-      .two-col,
-      .chart-grid {
-        grid-template-columns: 1fr;
-      }
-      .filter-panel {
-        flex-direction: column;
-        align-items: stretch;
-      }
+      .two-col, .chart-grid { grid-template-columns: 1fr; }
+      .filter-panel { flex-direction: column; align-items: stretch; }
     }
 
     @media (max-width: 600px) {
-      .dashboard {
-        padding: 16px;
-      }
-      .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .kpi-value {
-        font-size: 1.8rem;
-      }
+      .dashboard { padding: 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 1.8rem; }
     }
   </style>
 </head>
@@ -695,25 +622,21 @@
   <!-- KPI Cards -->
   <div class="kpi-grid">
     <div class="kpi-card">
-      <div class="kpi-icon"><i class="fas fa-globe"></i></div>
       <div class="kpi-label">Global Renewable Share</div>
       <div class="kpi-value" id="kpiGlobalShare">—</div>
       <div class="kpi-meta" id="kpiGlobalShareMeta">latest year</div>
     </div>
     <div class="kpi-card amber">
-      <div class="kpi-icon"><i class="fas fa-bolt"></i></div>
       <div class="kpi-label">Top Country Share</div>
       <div class="kpi-value" id="kpiTopCountry">—</div>
       <div class="kpi-meta" id="kpiTopCountryMeta">highest in selected period</div>
     </div>
     <div class="kpi-card blue">
-      <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
       <div class="kpi-label">Comparison Countries</div>
       <div class="kpi-value" id="kpiCountCount">5</div>
       <div class="kpi-meta">selected for comparison</div>
     </div>
     <div class="kpi-card red">
-      <div class="kpi-icon"><i class="fas fa-fire"></i></div>
       <div class="kpi-label">Global Fossil Share</div>
       <div class="kpi-value" id="kpiFossilShare">—</div>
       <div class="kpi-meta" id="kpiFossilMeta">latest year</div>
@@ -722,22 +645,18 @@
 
   <!-- Insight Panel -->
   <div class="insight-panel">
-    <div class="insight-title"><i class="fas fa-lightbulb"></i> Energy Transition Insights</div>
+    <div class="insight-title">Energy Transition Insights</div>
     <div class="insight-content">
       <div class="insight-item">
-        <div class="insight-icon"><i class="fas fa-chart-line"></i></div>
         <div class="insight-text"><strong>Global renewable share is slowly rising</strong> — From ~6% in 1965 to ~13.5% today. Hydropower dominates, but wind/solar are growing fastest.</div>
       </div>
       <div class="insight-item">
-        <div class="insight-icon"><i class="fas fa-trophy"></i></div>
         <div class="insight-text"><strong>Iceland and Norway lead</strong> — Thanks to abundant hydro and geothermal resources, they achieve >70% renewable share.</div>
       </div>
       <div class="insight-item">
-        <div class="insight-icon"><i class="fas fa-flag"></i></div>
         <div class="insight-text"><strong>Large emitters lag behind</strong> — China, India, and the USA have renewable shares below 20%, though absolute renewable capacity is growing rapidly.</div>
       </div>
       <div class="insight-item">
-        <div class="insight-icon"><i class="fas fa-fire"></i></div>
         <div class="insight-text"><strong>Fossil fuels still dominate</strong> — Even in leading countries, fossil fuels often provide the majority of total energy consumption.</div>
       </div>
     </div>
@@ -747,7 +666,7 @@
   <div class="two-col">
     <div class="chart-card">
       <div class="card-header">
-        <h2><i class="fas fa-chart-area" style="color:var(--accent);"></i> Global Renewable Share Over Time</h2>
+        <h2>Global Renewable Share Over Time</h2>
       </div>
       <div class="chart-container" id="globalRenewableWrap">
         <div class="loading-overlay" id="globalRenewableOverlay"><div class="spinner"></div></div>
@@ -756,7 +675,7 @@
     </div>
     <div class="chart-card">
       <div class="card-header">
-        <h2><i class="fas fa-trophy" style="color:var(--clay);"></i> Top 15 Countries by Renewable Share</h2>
+        <h2>Top 15 Countries by Renewable Share</h2>
         <span style="font-size:0.78rem;color:var(--text-muted);" id="top15YearLabel"></span>
       </div>
       <div class="chart-container" id="topRenewableWrap">
@@ -770,7 +689,7 @@
   <div class="one-col">
     <div class="chart-card">
       <div class="card-header">
-        <h2><i class="fas fa-flag" style="color:var(--blue);"></i> Renewable Share Comparison by Country</h2>
+        <h2>Renewable Share Comparison by Country</h2>
       </div>
       <div class="chart-container" id="shareComparisonWrap">
         <div class="loading-overlay" id="shareComparisonOverlay"><div class="spinner"></div></div>
@@ -783,7 +702,7 @@
   <div class="one-col">
     <div class="chart-card">
       <div class="card-header">
-        <h2><i class="fas fa-balance-scale" style="color:var(--moss);"></i> Fossil vs Renewable Growth — Selected Countries Combined</h2>
+        <h2>Fossil vs Renewable Growth — Selected Countries Combined</h2>
       </div>
       <div class="chart-container" id="fossilVsRenewableWrap">
         <div class="loading-overlay" id="fossilVsRenewableOverlay"><div class="spinner"></div></div>
@@ -793,7 +712,7 @@
   </div>
 
   <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Overview</a>
-  <div class="footer"><i class="fas fa-leaf"></i>&nbsp; Data source: OWID &nbsp;·&nbsp; Use decade filter to focus analysis &nbsp;·&nbsp; Carbon Intelligence Dashboard</div>
+  <div class="footer"><i class="fas fa-leaf"></i>&nbsp; Data source: OWID &nbsp;·&nbsp; Use decade filter to focus analysis</div>
 </div>
 
 <script>
