@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* ----- 统一设计系统 (Earth & Data) ----- */
+    /* ===== 统一设计系统 (Earth & Data) ===== */
     :root {
       --bg:            #f9f7f3;
       --surface:       #ffffff;
@@ -59,7 +59,7 @@
       letter-spacing: -0.01em;
     }
 
-    /* ----- 导航栏 (与 index 一致) ----- */
+    /* ----- 导航栏 ----- */
     .navbar {
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(8px);
@@ -138,7 +138,6 @@
       padding: 32px 24px;
     }
 
-    /* ----- 页面标题 ----- */
     .page-title {
       margin-bottom: 28px;
     }
@@ -163,7 +162,7 @@
       font-weight: 400;
     }
 
-    /* ----- 过滤器面板 (GDP 风格) ----- */
+    /* ----- 过滤器面板 (统一风格) ----- */
     .filter-panel {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -191,8 +190,7 @@
       color: var(--text-muted);
     }
 
-    .filter-select,
-    .country-select {
+    .filter-select {
       padding: 8px 14px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
@@ -364,9 +362,11 @@
       gap: 10px;
     }
 
+    /* 图表容器 - 关键修复 */
     .chart-container {
       position: relative;
       height: 280px;
+      width: 100%;
       background: var(--surface-2);
       border-radius: var(--radius);
       padding: 10px;
@@ -374,8 +374,10 @@
     }
 
     canvas {
+      display: block;
       max-height: 260px;
       width: 100% !important;
+      height: auto !important;
     }
 
     .side-by-side {
@@ -400,7 +402,9 @@
       transition: opacity 0.2s;
     }
 
-    .loading-overlay.visible { opacity: 1; }
+    .loading-overlay.visible {
+      opacity: 1;
+    }
 
     .spinner {
       width: 22px;
