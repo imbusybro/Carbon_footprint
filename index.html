@@ -922,8 +922,7 @@
     'Oceania':       { bg:'rgba(20,162,162,0.72)',  border:'#14a2a2' },
     'Other':         { bg:'rgba(120,120,120,0.60)', border:'#787878' },
   };
-  const LINE_COLORS = ['#1e7a4a','#2058a8','#c97c12','#c94040','#a03ea8'];
-
+  const LINE_COLORS = ['#1e4a3d', '#2058a8', '#c17a3e', '#6b8c5c', '#c94040'];
   // ── State ──────────────────────────────────────────────────────
   let allCountries = [];
   let countryContinent = {};
@@ -1011,21 +1010,22 @@
   }
 
   function renderTags() {
-    const container = $('selectedCountriesTags');
-    container.innerHTML = '';
-    [...selectedCountries].forEach(c => {
-      const tag = document.createElement('span');
-      tag.className = 'country-tag';
-      tag.innerHTML = `${c} <span class="tag-remove" title="Remove"><i class="fas fa-times"></i></span>`;
-      tag.querySelector('.tag-remove').addEventListener('click', () => {
-        selectedCountries.delete(c);
-        const cb = document.querySelector(`#countryCheckboxList input[value="${CSS.escape(c)}"]`);
-        if (cb) cb.checked = false;
-        renderTags();
-      });
-      container.appendChild(tag);
+  const container = $('selectedCountriesTags');
+  container.innerHTML = '';
+  [...selectedCountries].forEach((c, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'country-tag';
+    tag.style.background = LINE_COLORS[i % LINE_COLORS.length];
+    tag.innerHTML = `${c} <span class="tag-remove" title="Remove"><i class="fas fa-times"></i></span>`;
+    tag.querySelector('.tag-remove').addEventListener('click', () => {
+      selectedCountries.delete(c);
+      const cb = document.querySelector(`#countryCheckboxList input[value="${CSS.escape(c)}"]`);
+      if (cb) cb.checked = false;
+      renderTags();
     });
-  }
+    container.appendChild(tag);
+  });
+}
 
   $('countrySearch').addEventListener('input', e => buildCheckboxList(e.target.value));
   $('countrySearch').addEventListener('focus', () => { $('countryCheckboxList').style.display='block'; });
