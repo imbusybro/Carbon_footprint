@@ -878,8 +878,10 @@
 
 <!-- Energy Mix -->
 <div class="chart-card">
-  <div class="card-header">
-    <h2>Energy Mix</h2>      </div>
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <h2>Energy Mix</h2>
+    <select class="styled-select" id="energyCountrySelect" style="width: auto;"></select>
+  </div>
   <div class="chart-container" id="energyMixContainer">
     <div class="chart-loading" id="energyMixLoading"><div class="spinner"></div> Loading…</div>
     <canvas id="energyMixChart"></canvas>
@@ -1410,15 +1412,24 @@
     ]);
   }
 
-  // ── Events ────────────────────────────────────────────────────
-  $('decadeFilter').addEventListener('change', e => { currentDecade=e.target.value; refreshAllCharts(); });
-  $('applyComparisonBtn').addEventListener('click', () => { drawComparison(); drawHeatmap(); });
-  $('energyCountrySelect').addEventListener('change', e => drawEnergyMix(e.target.value));
-  $('analyzeCountryBtn').addEventListener('click', () => {
-    const first = [...selectedCountries][0];
-    if (first) window.location.href=`country.html?country=${encodeURIComponent(first)}`;
-    else alert('Select at least one country first.');
-  });
+    // ── Events (with null checks) ─────────────────────────────────
+    const decFilter = $('decadeFilter');
+  if (decFilter) decFilter.addEventListener('change', e => { currentDecade=e.target.value; refreshAllCharts(); });
+
+  const applyBtn = $('applyComparisonBtn');
+  if (applyBtn) applyBtn.addEventListener('click', () => { drawComparison(); drawHeatmap(); });
+
+  const energySelect = $('energyCountrySelect');
+  if (energySelect) energySelect.addEventListener('change', e => drawEnergyMix(e.target.value));
+
+  const analyzeBtn = $('analyzeCountryBtn');
+  if (analyzeBtn) {
+    analyzeBtn.addEventListener('click', () => {
+      const first = [...selectedCountries][0];
+      if (first) window.location.href=`country.html?country=${encodeURIComponent(first)}`;
+      else alert('Select at least one country first.');
+    });
+  }
 
   // ── Init ──────────────────────────────────────────────────────
   async function init() {
