@@ -721,7 +721,6 @@
 
   const API = 'https://carbon-api-7its.onrender.com/api';
   const LINE_COLORS = ['#1e4a3d','#2058a8','#c17a3e','#c94040','#a03ea8','#14a2a2','#787878'];
-
   let allCountries     = [];
   let selectedCountries = new Set(['world','norway','brazil','iceland','india']);
   let currentDecade    = 'all';
@@ -805,25 +804,26 @@
   }
 
   function renderTags() {
-    const container = $('selectedCountriesTags');
-    container.innerHTML = '';
-    [...selectedCountries].forEach(c => {
-      const tag = document.createElement('span');
-      tag.className = 'country-tag';
-      tag.innerHTML = `${c} <span class="tag-remove"><i class="fas fa-times"></i></span>`;
-      tag.querySelector('.tag-remove').addEventListener('click', () => {
-        selectedCountries.delete(c);
-        const cb = document.querySelector(`#countryCheckboxList input[value="${CSS.escape(c)}"]`);
-        if (cb) cb.checked = false;
-        renderTags();
-        $('kpiCountCount').textContent = selectedCountries.size;
-        $('selCount').textContent = `(${selectedCountries.size})`;
-      });
-      container.appendChild(tag);
+  const container = $('selectedCountriesTags');
+  container.innerHTML = '';
+  [...selectedCountries].forEach((c, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'country-tag';
+    tag.style.background = LINE_COLORS[i % LINE_COLORS.length];
+    tag.innerHTML = `${c} <span class="tag-remove"><i class="fas fa-times"></i></span>`;
+    tag.querySelector('.tag-remove').addEventListener('click', () => {
+      selectedCountries.delete(c);
+      const cb = document.querySelector(`#countryCheckboxList input[value="${CSS.escape(c)}"]`);
+      if (cb) cb.checked = false;
+      renderTags();
+      $('kpiCountCount').textContent = selectedCountries.size;
+      $('selCount').textContent = `(${selectedCountries.size})`;
     });
-    $('kpiCountCount').textContent = selectedCountries.size;
-    $('selCount').textContent = `(${selectedCountries.size})`;
-  }
+    container.appendChild(tag);
+  });
+  $('kpiCountCount').textContent = selectedCountries.size;
+  $('selCount').textContent = `(${selectedCountries.size})`;
+}
 
   $('countrySearch').addEventListener('input', e => buildCheckboxList(e.target.value));
   $('countrySearch').addEventListener('focus', () => { $('countryCheckboxList').style.display='block'; });
