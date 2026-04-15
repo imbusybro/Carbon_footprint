@@ -745,49 +745,142 @@
     // 1. Dual‑axis line chart (kept as‑is, works)
     // --------------------------------------------------------------
     async function drawLineChart() {
-      showLoader('lineLoading');
-      try {
-        const emissionsPromises = selectedEntities.map(e => api(`/compare?countries=${encodeURIComponent(e)}`).catch(()=>[]));
-        const emissionsResults = await Promise.all(emissionsPromises);
-        const yearsSet = new Set();
-        const entityData = selectedEntities.map((entity, idx) => {
-          const emData = filterByDecade(emissionsResults[idx] || [], 'year');
-          const gdpData = filterByDecade(allGdpData, 'year').filter(d => 
-            (entityMode === 'country' ? d.country_name?.toLowerCase() === entity : countryContinent[d.country_name?.toLowerCase()] === entity)
-          );
-          const emMap = Object.fromEntries(emData.map(d => [d.year, d.total_emissions]));
-          const gdpMap = {};
-          gdpData.forEach(d => { if (!gdpMap[d.year]) gdpMap[d.year] = 0; gdpMap[d.year] += d.gdp || 0; });
-          const years = [...new Set([...Object.keys(emMap), ...Object.keys(gdpMap)])].map(Number).sort();
-          years.forEach(y => yearsSet.add(y));
-          return { entity, emMap, gdpMap, color: LINE_COLORS[idx % LINE_COLORS.length] };
-        });
-        const years = Array.from(yearsSet).sort((a,b)=>a-b);
-        const datasets = [];
-        entityData.forEach(({entity, emMap, gdpMap, color}) => {
-          datasets.push({ label: entity, data: years.map(y => emMap[y] || null), borderColor: color, borderWidth: 3, yAxisID: 'yLeft', tension: 0.2, spanGaps: true });
-          datasets.push({ label: entity + ' GDP', data: years.map(y => gdpMap[y] || null), borderColor: color, borderDash: [6,4], borderWidth: 2.5, yAxisID: 'yRight', tension: 0.2, spanGaps: true, pointRadius: 0 });
-        });
-        const ctx = $('lineChart').getContext('2d');
-        destroy(lineChart);
-        lineChart = new Chart(ctx, {
-          type: 'line', data: { labels: years, datasets },
-          options: {
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-            plugins: {
-              legend: { labels: { filter: item => !item.text.includes('GDP'), color: '#4a5e47', font:{size:11} } },
-              tooltip: { backgroundColor:'#1e2e24', callbacks: { label: ctx => { const v = ctx.raw; if (v == null) return null; const isGDP = ctx.dataset.yAxisID === 'yRight'; const label = ctx.dataset.label.replace(' GDP',''); return `${label}: ${isGDP ? '$'+formatNum(v) : formatNum(v)+' Mt'}`; } } }
-            },
-            scales: {
-              x: { grid: { display: false }, ticks:{color:'#7a927a'} },
-              yLeft: { type: 'linear', position: 'left', title: { display: true, text: 'CO₂ Emissions (Mt)', color: '#1e4a3d' }, ticks: { callback: v => formatNum(v)+' Mt', color: '#1e4a3d' } },
-              yRight: { type: 'linear', position: 'right', title: { display: true, text: 'GDP (USD)', color: '#64748b' }, ticks: { callback: v => '$'+formatNum(v), color: '#64748b' }, grid: { drawOnChartArea: false } }
+  showLoader('lineLoading');
+  try {
+    const emissionsPromises = selectedEntities.map(e => 
+      api(`/compare?countries=${encodeURIComponent(e)}`).catch(() => [])
+    );
+    const emissionsResults = await Promise.all(emissionsPromises);
+    
+    console.log('📈 Emissions data received:', emissionsResults);
+    
+    const yearsSet = new Set();
+    const entityData = selectedEntities.map((entity, idx) => {
+      const emData = filterByDecade(emissionsResults[idx] || [], 'year');
+      const gdpData = filterByDecade(allGdpData, 'year').filter(d => 
+        (entityMode === 'country' ? d.country_name?.toLowerCase() === entity : countryContinent[d.country_name?.toLowerCase()] === entity)
+      );
+      
+      console.log(`🌍 ${entity}: emissions years=${emData.length}, gdp years=${gdpData.length}`);
+      
+      const emMap = {};
+      emData.forEach(d => { emMap[d.year] = d.total_emissions; });
+      
+      const gdpMap = {};
+      gdpData.forEach(d => { 
+        if (!gdpMap[d.year]) gdpMap[d.year] = 0;
+        gdpMap[d.year] += d.gdp || 0;
+      });
+      
+      const years = [...new Set([...Object.keys(emMap), ...Object.keys(gdpMap)])].map(Number).sort();
+      years.forEach(y => yearsSet.add(y));
+      
+      return { entity, emMap, gdpMap, color: LINE_COLORS[idx % LINE_COLORS.length] };
+    });
+    
+    const years = Array.from(yearsSet).sort((a,b) => a - b);
+    console.log('📅 Years range:', years[0], 'to', years[years.length-1]);
+    
+    const datasets = [];
+    entityData.forEach(({entity, emMap, gdpMap, color}) => {
+      // Emissions dataset (solid line, left axis)
+      const emissionsData = years.map(y => {
+        const val = emMap[y];
+        if (val === undefined || val === null) return null;
+        return val;
+      });
+      console.log(`📊 ${entity} emissions values:`, emissionsData.filter(v => v !== null).length, 'non-null points');
+      
+      datasets.push({
+        label: entity,
+        data: emissionsData,
+        borderColor: color,
+        backgroundColor: 'transparent',
+        borderWidth: 3,
+        pointRadius: years.length > 30 ? 0 : 3,
+        pointHoverRadius: 5,
+        tension: 0.2,
+        yAxisID: 'yLeft',
+        spanGaps: true
+      });
+      
+      // GDP dataset (dashed line, right axis)
+      const gdpDataVals = years.map(y => gdpMap[y] || null);
+      datasets.push({
+        label: entity + ' GDP',
+        data: gdpDataVals,
+        borderColor: color,
+        borderDash: [6, 4],
+        borderWidth: 2.5,
+        pointRadius: 0,
+        tension: 0.2,
+        yAxisID: 'yRight',
+        spanGaps: true
+      });
+    });
+    
+    const canvas = $('lineChart');
+    if (!canvas) throw new Error('Canvas not found');
+    const ctx = canvas.getContext('2d');
+    destroy(lineChart);
+    
+    lineChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: years, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            labels: {
+              filter: item => !item.text.includes('GDP'),
+              color: '#4a5e47',
+              font: { size: 11 }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1e2e24',
+            callbacks: {
+              label: (ctx) => {
+                const v = ctx.raw;
+                if (v == null) return null;
+                const isGDP = ctx.dataset.yAxisID === 'yRight';
+                const label = ctx.dataset.label.replace(' GDP', '');
+                return `${label}: ${isGDP ? '$' + formatNum(v) : formatNum(v) + ' Mt'}`;
+              }
             }
           }
-        });
-      } catch(e) { $('lineContainer').innerHTML = '<div class="error-message">Failed to load chart data</div>'; }
-      finally { hideLoader('lineLoading'); }
-    }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#7a927a' }
+          },
+          yLeft: {
+            type: 'linear',
+            position: 'left',
+            title: { display: true, text: 'CO₂ Emissions (Mt)', color: '#1e4a3d' },
+            ticks: { callback: v => formatNum(v) + ' Mt', color: '#1e4a3d' }
+          },
+          yRight: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'GDP (USD)', color: '#64748b' },
+            ticks: { callback: v => '$' + formatNum(v), color: '#64748b' },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+    console.log('✅ Dual‑axis chart rendered with', datasets.length, 'datasets');
+  } catch(e) {
+    console.error('❌ Line chart error:', e);
+    $('lineContainer').innerHTML = '<div class="error-message">Failed to load chart data</div>';
+  } finally {
+    hideLoader('lineLoading');
+  }
+}
   
     // --------------------------------------------------------------
     // 2. Continent bar chart – FIXED VERSION
