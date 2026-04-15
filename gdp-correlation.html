@@ -965,57 +965,73 @@
       console.log('📊 GDP rows:', allGdpData.length);
     }
     
-    // Get all available years for reference
-    const allYears = [...new Set(allGdpData.map(d => d.year))].sort();
-    console.log('📅 All years in GDP data:', allYears.slice(0,5), '...', allYears.slice(-5));
+    // Log a sample of GDP data to verify structure
+    console.log('📊 Sample GDP row:', allGdpData[0]);
     
     // Apply decade filter
     let filteredGdp = filterByDecade(allGdpData, 'year');
-    console.log('📅 After decade filter (', currentDecade, '):', filteredGdp.length, 'rows');
+    console.log(`📅 After decade filter (${currentDecade}):`, filteredGdp.length, 'rows');
     
     if (filteredGdp.length === 0) {
       console.warn('⚠️ No GDP data for selected decade, using all-time data');
       filteredGdp = allGdpData;
     }
     
-    // Find the most recent year WITH actual GDP values
+    // Find years with actual GDP values
     const yearsWithGdp = [...new Set(filteredGdp.filter(d => d.gdp > 0).map(d => d.year))];
+    console.log('📅 Years with GDP > 0:', yearsWithGdp.slice(0,5), '...');
+    
     const latestYear = yearsWithGdp.length ? Math.max(...yearsWithGdp) : 2020;
     console.log('📅 Using latest year with GDP:', latestYear);
     
     // Filter to that year only
     const recent = filteredGdp.filter(d => d.year === latestYear && d.gdp > 0);
     console.log(`📈 Countries with GDP in ${latestYear}:`, recent.length);
+    if (recent.length > 0) {
+      console.log('   Sample:', recent.slice(0,3).map(d => `${d.country_name}: $${d.gdp}`));
+    }
     
     if (recent.length === 0) {
       throw new Error(`No countries have GDP data for ${latestYear}`);
     }
     
-    // Also fetch emissions for all countries in parallel (much faster)
+    // Fetch emissions for a sample country first to verify the API works
+    const testCountry = recent[0].country_name;
+    console.log(`🧪 Testing emissions fetch for ${testCountry}...`);
+    try {
+      const testEm = await api(`/compare?countries=${encodeURIComponent(testCountry)}`);
+      console.log(`   Sample emissions for ${testCountry}:`, testEm.slice(0,3));
+    } catch (e) {
+      console.error('   Test emissions fetch failed:', e);
+    }
+    
+    // Build emissions map
     const countryNames = recent.map(d => d.country_name).filter(Boolean);
     console.log(`🌍 Fetching emissions for ${countryNames.length} countries...`);
     
-    // Create a map of emissions by country for the target year
     const emissionsMap = new Map();
-    
-    // Process in batches to avoid overwhelming the API
     const batchSize = 10;
     for (let i = 0; i < countryNames.length; i += batchSize) {
       const batch = countryNames.slice(i, i + batchSize);
       await Promise.all(batch.map(async (country) => {
         try {
           const emData = await api(`/compare?countries=${encodeURIComponent(country)}`);
-          // Find the emissions for our target year (or closest)
           const targetEm = emData.find(e => e.year === latestYear)?.total_emissions;
           if (targetEm !== undefined && targetEm !== null) {
             emissionsMap.set(country, targetEm);
+          } else {
+            console.warn(`   No emissions for ${country} in ${latestYear}`);
           }
         } catch (e) {
-          // skip
+          console.warn(`   Failed to fetch emissions for ${country}:`, e.message);
         }
       }));
     }
     console.log('🌍 Emissions map size:', emissionsMap.size);
+    if (emissionsMap.size > 0) {
+      const firstEntry = [...emissionsMap.entries()][0];
+      console.log(`   Example: ${firstEntry[0]} -> ${firstEntry[1]} Mt`);
+    }
     
     // Build intensities array
     const intensities = [];
@@ -1028,12 +1044,14 @@
         const intensity = (emissions * 1e12) / d.gdp;
         const continent = countryContinent[country.toLowerCase()] || 'Other';
         intensities.push({ country, intensity, continent });
+      } else {
+        if (!emissions) console.warn(`   Skipping ${country}: no emissions data`);
+        else if (d.gdp <= 0) console.warn(`   Skipping ${country}: GDP <= 0`);
       }
     }
     
     console.log(`🔥 Calculated intensities for ${intensities.length} countries`);
     
-    // Sort and take top 15
     const top15 = intensities.sort((a,b) => b.intensity - a.intensity).slice(0,15);
     console.log('🏆 Top 15:', top15.map(d => `${d.country}: ${d.intensity.toFixed(2)}`));
     
