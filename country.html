@@ -529,8 +529,8 @@
 
     <!-- Dynamic insight panel -->
     <div class="insight-panel">
-      <div class="insight-title"><i class="fas fa-lightbulb"></i> Key Takeaways for <span id="insightCountryName">this country</span></div>
-      <div class="insight-content" id="countryInsights"></div>
+      <div class="insight-title">Key Insights</div>
+          <div class="insight-content" id="countryInsights"></div>
     </div>
 
     <!-- Chart grid -->
@@ -686,7 +686,7 @@
         ];
         const items = insights[country.toLowerCase()] || generic;
         $('countryInsights').innerHTML = items.map(i => `
-          <div class="insight-item"><div class="insight-icon"><i class="fas fa-${i.icon}"></i></div><div class="insight-text">${i.text}</div></div>
+          <div class="insight-item"><div class="insight-text">${i.text}</div></div>
         `).join('');
         $('insightCountryName').innerText = country;
       }
