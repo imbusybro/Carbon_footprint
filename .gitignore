@@ -2,3 +2,4 @@
 node_modules/
 carbon.env
 .env
+.DS_Store
